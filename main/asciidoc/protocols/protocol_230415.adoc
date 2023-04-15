@@ -1,0 +1,37 @@
+= Protokoll Gruppe 2
+
+Treffen am 15.04.2023
+
+Ort:      BigBlueButton +
+Beginn:   13:00 Uhr +
+Ende:     13:29 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+18.04.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Astrid Rindfleisch
+- Duc Hieu Le
+- Leon Kunze
+- Andrii Roshkovan
+- Robert Peter
+
+== Bemerkungen
+
+
+== Retrospektive des letzten Sprints
+- jedes Teammitglieder hat sich mit der Aufgabenstellung vertraut gemacht und allgemeine Fragen wurden von Prof. Weinkauf beantwortet
+
+== Aktueller Stand
+- die Rollen wurden auf die Teammitglieder aufgeteilt:
+                                                        - Leon: Literature Search
+                                                        - Le, Andrii und Robert: Software Development
+                                                        - Astrid: Evaluation
+- alle Teammitglieder haben zugriff auf GitHub-Repository erhalten
+- das Lastenheft wird von Leon übernommen
+- das Pflichtenheft wird von der Gruppe Software Development übernommen (ein Plichtenheft für referenzen wird dem Repository hinzugefügt)
+
+== Planung des nächsten Sprints
+- die Teammitglieder finden sich in ihren Gruppen zurecht und beginnen mit ihren Aufgaben
