@@ -1,0 +1,50 @@
+= Protokoll Gruppe 2
+
+Treffen am 25.04.2023
+
+Ort:      BigBlueButton +
+Beginn:   15:19 Uhr +
+Ende:     15:36 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+2.05.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Astrid Rindfleisch
+- Duc Hieu Le
+- Leon Kunze
+- Andrii Roshkovan
+
+== Bemerkungen
+
+
+== Retrospektive des letzten Sprints
+- Leon hat die erste Version des Lastenhefts erstellt
+- Le programmierte eine Crawler, der die URL's der Landkreisliste importiert und in einer log-Datei speichert
+
+== Aktueller Stand
+- weiteres vorgehen wird weiterhin wöchentlich besprochen
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung wurden aufgeteilt:
+** Le:
+*** erstellen eines HTML-Crawlers der die URL-Links zusammenfasst und in eine HTML-Datei als String weiterleitet 
+*** Anzahl von E-Services direkt auf dieser Seite 
+*** Anzahl von Links auf E-Services auf dieser Seite 
+** Andrii:
+*** Anzahl von „Informationsobjekten“ mit wahrscheinlichem Raumbezug 
+*** Anzahl von Adressangaben (indirekter Raumbezug) 
+*** Anzahl von Koordinaten (Paaren …) 
+** Robert:
+*** Anzahl interaktiver, eingebetteter Karten 
+*** Anzahl extern verlinkter Karten
+** Astrid:
+*** Anreicherung der Landkreiswebsitegesamtstatistik um weitere Metadatenfelder pro Datensatz = Tupel = Zeile = Landkreis: 
+*** Bundesland 
+*** Flächengröße in qkm 
+*** AnzAhl Einwohner
+** Leon:
+*** erstellen des Pflichtenhefts (exklusiv der Diagramme)
+*** Literatur nach Geo-Content Management durchsuchen
