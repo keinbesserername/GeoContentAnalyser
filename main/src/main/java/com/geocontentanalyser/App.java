@@ -1,5 +1,6 @@
 package com.geocontentanalyser;
 
+import com.geocontentanalyser.urlscraper.SiteURLExtractor;
 import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
 /**
@@ -9,7 +10,10 @@ import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 public class App 
 {
     public static void main( String[] args )
-    {
-        WikiScrapperMain.crawler();
+    {   
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor();
+        siteURLExtractor.setBaseURL("https://www.saalekreis.de");
+        siteURLExtractor.extractURL("https://www.saalekreis.de", 0);
+        //WikiScrapperMain.crawler();
     }
 }
