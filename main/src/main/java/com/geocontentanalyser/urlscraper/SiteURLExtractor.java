@@ -15,13 +15,11 @@ public class SiteURLExtractor {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
 
-    public void extractURL(String URL, int recursiveDepth) {
+    public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
-        HTMLRetriever htmlRetriever = new HTMLRetriever();
-        String content = htmlRetriever.getHTML(URL);
 
         // parse content into HTML
-        Document doc = Jsoup.parse(content, URL);
+        Document doc = Jsoup.connect(URL).get();
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
@@ -45,7 +43,7 @@ public class SiteURLExtractor {
             for (String link : localresultURLs) {
                 // delay 1 second
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(250);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

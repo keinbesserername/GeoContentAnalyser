@@ -1,5 +1,7 @@
 package com.geocontentanalyser;
 
+import java.io.IOException;
+
 import com.geocontentanalyser.urlscraper.SiteURLExtractor;
 import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
@@ -9,7 +11,7 @@ import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
  */
 public class App 
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException
     {   
         SiteURLExtractor siteURLExtractor = new SiteURLExtractor();
         siteURLExtractor.setBaseURL("https://www.saalekreis.de");
