@@ -1,0 +1,168 @@
+= Pflichtenheft
+:project_name: GeoContentAnalyser
+== __{project_name}__
+
+[options="header"]
+[cols="10%, 15%, 20%, 15%, 40%"]
+|===
+|Version| Status    | Bearbeitungs- datum | Autoren(en)    |  Vermerk
+|0.1    | In Arbeit | 07.05.2023        | Leon Kunze         | Initiale Version
+|===
+
+== Zusammenfassung
+Dieses Dokument stellt das Pflichtenheft des Projekts _GeoContentAnalyser_ dar. Es soll einen Überblick 
+über die zu erstellende Software bieten und fungiert als Vermittlungsmedium zwischen den Stakeholdern 
+dieses Projekts. Es beschreibt detailliert, welche Anforderungen die Software erfüllen soll und zum Teil 
+wie sie implementiert wird. Sobald der Auftraggeber dieses Pflichtenheft akzeptiert hat, beginnt die Umsetzung  
+des Projekts.
+
+Das Pflichtenheft sollte korrekt, vollständig und konsistent sein, da es bei der Beendigung des Projekts 
+zur Überprüfung dienen wird, ob die Software alle gestellten Anforderungen wunschgemäß erfüllt. Über das ganze Projekt 
+hinweg wird es konstant hinzugezogen und berücksichtigt werden, weswegen es leicht veränderbar und 
+erweiterbar sein sollte. Änderungen am Dokument sollten dennoch auf ein Minimum reduziert werden, nachdem 
+der Inhalt einmal abgesegnet wurde. Da sich Umstände und Anforderungen im Laufe des Projekts ständig 
+ändern können, werden Anpassungen erwartet und müssen entsprechend dokumentiert werden.
+
+== Aufgabenstellung und Zielsetzung
+Es soll ein Softwaretool erstellt werden, dass quantitative Daten zum Thema „Geo Content Management“ ermitteln und 
+statistisch auswertbar abspeichern soll. Das Softwaretoll soll als ausschließlich englischsprachige 
+JAVA-Konsolenanwendung ohne spezielle Bibliotheken entwickelt werden. Die Daten sollen als Datei im 
+"Markdown Table"-Format, in einem konfigurierbaren Datenverzeichnis, gespeichert werden. Dafür sollen an einem 
+dokumentierten Stichtag die URLs der Landkreisliste, laut Wikipedia, importiert werden. Diese sollem im Datenverzeichnis 
+in einem Unterordner mit Datum und Uhrzeitangabe im Ordnernamen hinterlegt sein. Anschließend soll eine Logdatei namens 
+„Landkreiswebsitegesamtstatistik“, mit Datum und Uhrzeit, angelegt werden. In der Logdatei befinden sich die 
+Ergebniszusammenfassung. Die Datei speichert eine Tabelle aller Landkreise mit den aggregierten Ergebnissen je Landkreis. 
+Daraufhin soll ein zeitgesteuerter Crawler, der nicht als BOT identifiziert wird, auf jede Landkreisseite gehen. Danach 
+wird eine Logdatei namens „Landkreisseitenstatistik“, mit Datum und Uhrzeit, für die Analysestatistik pro einzelner 
+Landkreisinhaltsseite angelegt. Dieser Crawler analysiert den Inhalt der Seiten nach der Anzahl von: 
+    - „Informationsobjekten“ mit wahrscheinlichem Raumbezug
+    - interaktiven, eingebetteten Karten
+    - extern verlinkten Karten
+    - Adressangaben (indirekter Raumbezug)
+    - Koordinaten
+    - E-Services direkt auf dieser Seite
+    - Links auf E-Services auf dieser Seite
+Dann wird für jede einzelne Seite eine Logdatei, mit den Beweisen, im "Markdown Table"-Format, angelegt und die Datei 
+"Landkreisseitenstatistik" wird mit den gefundenen Informationen aktualisiert. Als nächstes wird die Gesamtstatistik, 
+also die Datei „Landkreiswebsitegesamtstatistik“, aktualisiert. Zuletzt wird die „Landkreiswebsitegesamtstatistik“,
+um weitere Metadaten "Bundesland", "Flächengröße in qkm" und "Anzahl Einwohner" erweitert.
+
+== Produktnutzung
+Hier wird ein Überblick gegeben, wie und unter welchen Umständen das Produkt nach Fertigstellung genutzt werden
+soll.
+
+Die Software wird als Softwaretool genutz, mit dem spezifischen geographischen Daten in vorher bestimmten Regionen 
+erhoben werden. 
+
+Der Source-Code könnte zum Schluss über GitHub veröffentlicht werden, wodurch dieser für alle im Internet zur 
+verfügung steht.
+
+Das Produkt soll nur wenig Wartung benötigen und die Daten sollen dauerhaft in selbst erstellten Dateien gespeichert 
+und über die Anwendung zugreifbar sein.
+
+== Interessengruppen (Stakeholder)
+Die Interessengruppen, welche Nutzen aus dem GeoContentAnalyser ziehen wollen, und ihre Ziele bei der Umsetzung
+des Projekts sind der folgenden Tabelle zu entnehmen. Dabei wird zusätzlich eine Prioritätenreihenfolge 
+der einzelnen Gruppen festgelegt (von 1 = geringe Priorität bis 10 = hohe Priorität), um bei konkurrierenden 
+Interessen und Abarbeitungsreihenfolgen im Projektverlauf klare Entscheidungen zu ermöglichen.
+
+[options="header", cols=" ^11%, 25%, 50%"]
+|===
+|Beschreibung |Priorität |Ziele
+|Auftraggeber
+|8 
+a|
+- ein vollständig funktionsfähiges Softwaretool, welches alle Funktionalitäten hat
+|===
+
+== Top-Level-Architektur
+Die Top-Level-Architektur wird hier durch ein Komponentendiagramm veranschaulicht. Komponentendiagramme stellen 
+die Struktur des Softwaresystems dar und beschreiben die Softwarekomponenten, ihre Schnittstellen, sowie Abhängigkeiten.
+
+Die Software wird aktuell aus den folgenden Komponenten zusammengestellt:
+
+//TODO
+[[Komponentendiagramm]] 
+image::./models/analysis/Komponentendiagramm.png[Komponentendiagramm, 100%, 100%, pdfwidth=100%, title= "Komponentendiagramm von {project_name}", align=center, caption="Abbildung 1: "]
+
+
+// Beschreibung des Komponentendiagramms kommt hier
+
+
+== Anwendungsfälle
+In diesem Abschnitt werden die grundlegenden Funktionalitäten der Anwendung
+in Form von Anwendungsfällen übersichtlich für alle Anwendergruppen aufgeführt.
+Es wird zudem eine klare Abgrenzung zwischen den zur Anwendung gehörigen und nicht 
+gehörigen Funktionalitäten gemacht. Darüber hinaus werden auch Beziehungen zwischen 
+den Anwendungsfällen mit aufgenommen.
+
+=== Akteure
+Zunächst erfolgt eine klare Definition aller Akteure, die die Anwendung nutzen sollen, und deren
+Interessen bei der Gestaltung der Anwendungsfälle eine wesentliche Rolle spielen.
+Die Akteure sind folgender Tabelle zu entnehmen. Dabei beschreiben kursiv gestaltete Akteure
+zusätzlich eine hierarchische Gruppierung mehrerer, untergeordneter Akteure.  
+
+[options="header",cols="30%,70%"]
+|===
+|Name                       |Beschreibung
+|_Auftraggeber_  			|Person, die das Softwaretool abnimmt
+|===
+
+=== Überblick Anwendungsfalldiagramm
+
+//TODO
+[[Anwendungsfalldiagramm]]
+image::./models/analysis/Anwendungsfalldiagramm.png[Anwendungsfalldiagramm, 100%, 100%, pdfwidth=100%, title= "Anwendungsfalldiagramm von {project_name}", align=center, caption="Abbildung 2: "]
+
+=== Anwendungsfallbeschreibungen
+
+//TODO continiue here
+[cols="20%h, 80%"]
+[[UC0100]]
+|===
+|ID                         |**<<UC0100>>**
+|Name                       |Login/Logout
+|Beschreibung               |ein Nutzer muss sich in der Anwendung anmelden (Login), um Zugriff auf +
+die Funktionalitäten im geschlossenen Bereich zu erhalten. Eine Abmeldung (Logout) soll diesen
+Zugriff wieder beenden
+|Akteur                     |Nutzer
+|Auslöser                  a|
+* Login: Nutzer möchte die Funktionalitäten der Anwendung nutzen
+* Logout: Nutzer möchte die Anwendung verlassen
+|Vorbedingungen            a|
+* Login: Nutzer ist noch nicht in der Anwendung angemeldet
+* Logout: Nutzer ist angemeldet
+|Schritte                   a|
+* Login: +
+1. Nutzer drückt den Button "Einloggen" in der Navigationsleiste auf der Startseite +
+2. Nutzer gibt seinen Nutzernamen und sein Passwort in das Dialogfeld ein +
+3. Nutzer drückt Button "Einloggen"
+* Logout: + 
+1. Nutzer drückt den Button "Ausloggen" in der Navigationsleiste auf der Startseite
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0100>> <<AF0101>>
+|===
+
+//TODO
+[[/* INSERT NAME HERE */]]
+image::./models/analysis/Sequenzdiagramme/Auftritt_buchen.png[/* SAME AS HEADER */, 80%, 80%, pdfwidth=80%, title= "Sequenzdiagramm zu << /* INSERT ID HERE */>>", align=center, caption="Abbildung 3: "]
+
+== Funktionale Anforderungen
+
+== Nicht-Funktionale Anforderungen
+
+== GUI Prototyp
+
+=== Überblick: Dialoglandkarte
+
+=== Dialogbeschreibung
+
+== Datenmodell
+
+=== Überblick: Klassendiagramm
+
+=== Klassen und Enumerationen
+
+== Akzeptanztestfälle
+
+== Glossar
