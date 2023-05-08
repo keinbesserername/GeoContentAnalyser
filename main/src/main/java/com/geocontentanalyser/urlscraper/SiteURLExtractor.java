@@ -11,9 +11,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
 
-public class SiteURLExtractor {
+public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
+
+    public SiteURLExtractor(String baseURL) {
+        this.baseURL = baseURL;
+    }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
@@ -29,7 +33,7 @@ public class SiteURLExtractor {
 
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/links.txt", true);
+            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", true);
             for (String link : localresultURLs) {
                 writer.write(link + "\n");
             }
@@ -80,6 +84,22 @@ public class SiteURLExtractor {
 
     public void setBaseURL(String baseURL) {
         this.baseURL = baseURL;
+    }
+
+    @Override
+    public void run() {
+        // remove the previous output file
+        try {
+            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", false);
+            writer.close();
+        } catch (IOException e) {
+        }
+
+        try {
+            extractURL(baseURL, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
