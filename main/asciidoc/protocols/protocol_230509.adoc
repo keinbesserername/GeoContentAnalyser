@@ -1,0 +1,36 @@
+= Protokoll Gruppe 2
+
+Treffen am 09.05.2023
+
+Ort:      BigBlueButton +
+Beginn:   15:20 Uhr +
+Ende:     15:28 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+16.05.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Astrid Rindfleisch
+- Duc Hieu Le
+- Leon Kunze
+- Robert Peter
+- Andrii Roshkovan
+
+== Bemerkungen
+- am Donnerstag, der 04.05.2023, gab es ein Meeting mit Prof. Weinkauf:
+    - Projectplan eventuell farblich gestalten
+    - Astrid wurde eine Seite für die Statistik gegeben
+
+== Retrospektive des letzten Sprints
+- Leon hat das Pflichtenheft (ohne Diagramme) nachgereicht
+
+== Aktueller Stand
+- Leon beginnt mit der Literatur Search
+- Robert kann mit dem Programmieren starten
+- Astrid hat Seite von Prof. Winkauf bekommen die sie sich druchlesen kann
+- bei Andrii gab es kleinere Probleme, aber weites gehent alls gut 
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung werden weiterhin, wie am 25.04.2023 besprochen, bearbeitet
