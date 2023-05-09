@@ -14,10 +14,11 @@ import org.jsoup.select.Elements;
 public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
-    String fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
+    String fileName;
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
+        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
