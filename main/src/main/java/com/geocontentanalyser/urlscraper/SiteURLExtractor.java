@@ -11,39 +11,50 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
 
-public class SiteURLExtractor {
+public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
 
-    public void extractURL(String URL) {
-        HTMLRetriever htmlRetriever = new HTMLRetriever();
-        String content = htmlRetriever.getHTML(URL);
+    public SiteURLExtractor(String baseURL) {
+        this.baseURL = baseURL;
+    }
+
+    public void extractURL(String URL, int recursiveDepth) throws IOException {
+        recursiveDepth = 0;
+
         // parse content into HTML
-        Document doc = Jsoup.parse(content, URL);
+        Document doc = Jsoup.connect(URL).get();
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
         ArrayList<String> localresultURLs = deduplicate(links);
+        // add links to resultURLs
         resultURLs.addAll(localresultURLs);
+
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/links.txt", true);
+            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", true);
             for (String link : localresultURLs) {
                 writer.write(link + "\n");
             }
             writer.close();
         } catch (IOException e) {
         }
-        // call recursive function to extract links from each link
-        for (String link : localresultURLs) {
-            // delay 1 second
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+        // if recursive depth is less than 4, call recursive function
+        if (recursiveDepth <= 4) {
+            // call recursive function to extract links from each link
+            for (String link : localresultURLs) {
+                // delay 1 second
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                extractURL(link, recursiveDepth + 1);
             }
-            extractURL(link);
         }
+
     }
 
     public ArrayList<String> deduplicate(Elements links) {
@@ -71,6 +82,22 @@ public class SiteURLExtractor {
 
     public void setBaseURL(String baseURL) {
         this.baseURL = baseURL;
+    }
+
+    @Override
+    public void run() {
+        // remove the previous output file
+        try {
+            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", false);
+            writer.close();
+        } catch (IOException e) {
+        }
+
+        try {
+            extractURL(baseURL, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
