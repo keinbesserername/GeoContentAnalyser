@@ -17,7 +17,22 @@ public class LandkreisURLExtractor {
         Matcher matcher = pattern.matcher(content.substring(endIndex - 1));
         matcher.find();
         String temp = matcher.group(1);
-        url = temp.substring(0, temp.length() - 1);
+        url = stripLastSlash(temp);
         return url;
+    }
+
+    public String stripLastSlash(String temp) {
+        if (temp == null || temp.isEmpty()) {
+            return temp;
+        }
+        int lastIndex = temp.length() - 1;
+        while (lastIndex >= 0) {
+            char lastChar = temp.charAt(lastIndex);
+            if (lastChar != '/' && lastChar != '\\') {
+                break;
+            }
+            lastIndex--;
+        }
+        return temp.substring(0, lastIndex + 1);
     }
 }

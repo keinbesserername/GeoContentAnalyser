@@ -1,0 +1,31 @@
+= Protokoll Gruppe 2
+
+Treffen am 02.05.2023
+
+Ort:      BigBlueButton +
+Beginn:   15:15 Uhr +
+Ende:     15:20 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+09.05.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Astrid Rindfleisch
+- Duc Hieu Le
+- Leon Kunze
+- Robert Peter
+
+== Bemerkungen
+- Andrii war für diese Woche entschuldigt und sein zwischenstand wird nachgetragen
+
+== Retrospektive des letzten Sprints
+- Leon hat die erste Version des Projektplans erstellt
+- Le programmierte eine Crawler, der die URL's der Landkreisliste aufruft
+
+== Aktueller Stand
+- das Pflichtenheft wird von Leon nachgereicht
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung werden weiterhin, wie am 25.04.2023 besprochen, bearbeitet

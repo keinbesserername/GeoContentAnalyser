@@ -59,7 +59,6 @@ public class SiteURLExtractor implements Runnable {
 
     public ArrayList<String> deduplicate(Elements links) {
         Iterator<Element> it = links.iterator();
-
         while (it.hasNext()) {
             Element link = it.next();
             // check if contain javascript, #, mailto, or not html, not baseURL, or already
@@ -76,7 +75,6 @@ public class SiteURLExtractor implements Runnable {
         for (Element link : links) {
             set.add(link.attr("abs:href"));
         }
-
         // conversion to arraylist
         ArrayList<String> list = new ArrayList<String>(set);
         return list;

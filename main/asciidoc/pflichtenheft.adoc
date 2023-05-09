@@ -1,0 +1,327 @@
+= Pflichtenheft
+:project_name: GeoContentAnalyser
+== __{project_name}__
+
+[options="header"]
+[cols="10%, 15%, 20%, 15%, 40%"]
+|===
+|Version| Status    | Bearbeitungsdatum | Autoren(en)        |  Vermerk
+|0.1    | In Arbeit | 09.05.2023        | Leon Kunze         | Initiale Version
+|===
+
+== Zusammenfassung
+Dieses Dokument stellt das Pflichtenheft des Projekts _GeoContentAnalyser_ dar. Es soll einen Überblick 
+über die zu erstellende Software bieten und fungiert als Vermittlungsmedium zwischen den Stakeholdern 
+dieses Projekts. Es beschreibt detailliert, welche Anforderungen die Software erfüllen soll und zum Teil 
+wie sie implementiert wird. Sobald der Auftraggeber dieses Pflichtenheft akzeptiert hat, beginnt die Umsetzung  
+des Projekts.
+
+Das Pflichtenheft sollte korrekt, vollständig und konsistent sein, da es bei der Beendigung des Projekts 
+zur Überprüfung dienen wird, ob die Software alle gestellten Anforderungen wunschgemäß erfüllt. Über das ganze Projekt 
+hinweg wird es konstant hinzugezogen und berücksichtigt werden, weswegen es leicht veränderbar und 
+erweiterbar sein sollte. Änderungen am Dokument sollten dennoch auf ein Minimum reduziert werden, nachdem 
+der Inhalt einmal abgesegnet wurde. Da sich Umstände und Anforderungen im Laufe des Projekts ständig 
+ändern können, werden Anpassungen erwartet und müssen entsprechend dokumentiert werden.
+
+== Aufgabenstellung und Zielsetzung
+Es soll ein Softwaretool erstellt werden, dass quantitative Daten zum Thema „Geo Content Management“ ermitteln und 
+statistisch auswertbar abspeichern soll. Das Softwaretoll soll als ausschließlich englischsprachige 
+JAVA-Konsolenanwendung ohne spezielle Bibliotheken entwickelt werden. Die Daten sollen als Datei im 
+"Markdown Table"-Format, in einem konfigurierbaren Datenverzeichnis, gespeichert werden. Dafür sollen an einem 
+dokumentierten Stichtag die URLs der Landkreisliste, laut Wikipedia, importiert werden. Diese sollem im Datenverzeichnis 
+in einem Unterordner mit Datum und Uhrzeitangabe im Ordnernamen hinterlegt sein. Anschließend soll eine Logdatei namens 
+„Landkreiswebsitegesamtstatistik“, mit Datum und Uhrzeit, angelegt werden. In der Logdatei befinden sich die 
+Ergebniszusammenfassung. Die Datei speichert eine Tabelle aller Landkreise mit den aggregierten Ergebnissen je Landkreis. 
+Daraufhin soll ein zeitgesteuerter Crawler, der nicht als BOT identifiziert wird, auf jede Landkreisseite gehen. Danach 
+wird eine Logdatei namens „Landkreisseitenstatistik“, mit Datum und Uhrzeit, für die Analysestatistik pro einzelner 
+Landkreisinhaltsseite angelegt. Dieser Crawler analysiert den Inhalt der Seiten nach der Anzahl von: 
+    - „Informationsobjekten“ mit wahrscheinlichem Raumbezug
+    - interaktiven, eingebetteten Karten
+    - extern verlinkten Karten
+    - Adressangaben (indirekter Raumbezug)
+    - Koordinaten
+    - E-Services direkt auf dieser Seite
+    - Links auf E-Services auf dieser Seite
+Dann wird für jede einzelne Seite eine Logdatei, mit den Beweisen, im "Markdown Table"-Format, angelegt und die Datei 
+"Landkreisseitenstatistik" wird mit den gefundenen Informationen aktualisiert. Als nächstes wird die Gesamtstatistik, 
+also die Datei „Landkreiswebsitegesamtstatistik“, aktualisiert. Zuletzt wird die „Landkreiswebsitegesamtstatistik“,
+um weitere Metadaten "Bundesland", "Flächengröße in qkm" und "Anzahl Einwohner" erweitert.
+
+== Produktnutzung
+Hier wird ein Überblick gegeben, wie und unter welchen Umständen das Produkt nach Fertigstellung genutzt werden
+soll.
+
+Die Software wird als Softwaretool genutz, mit dem spezifischen geographischen Daten in vorher bestimmten Regionen 
+erhoben werden. 
+
+Der Source-Code könnte zum Schluss über GitHub veröffentlicht werden, wodurch dieser für alle im Internet zur 
+verfügung steht.
+
+Das Produkt soll nur wenig Wartung benötigen und die Daten sollen dauerhaft in selbst erstellten Dateien gespeichert 
+und über die Anwendung zugreifbar sein.
+
+== Interessengruppen (Stakeholder)
+Die Interessengruppen, welche Nutzen aus dem GeoContentAnalyser ziehen wollen, und ihre Ziele bei der Umsetzung
+des Projekts sind der folgenden Tabelle zu entnehmen. Dabei wird zusätzlich eine Prioritätenreihenfolge 
+der einzelnen Gruppen festgelegt (von 1 = geringe Priorität bis 10 = hohe Priorität), um bei konkurrierenden 
+Interessen und Abarbeitungsreihenfolgen im Projektverlauf klare Entscheidungen zu ermöglichen.
+
+[options="header", cols=" ^11%, 25%, 50%"]
+|===
+|Beschreibung |Priorität |Ziele
+|Auftraggeber
+|8 
+a|
+- ein vollständig funktionsfähiges Softwaretool, welches alle Funktionalitäten hat
+|===
+
+== Top-Level-Architektur
+Die Top-Level-Architektur wird hier durch ein Komponentendiagramm veranschaulicht. Komponentendiagramme stellen 
+die Struktur des Softwaresystems dar und beschreiben die Softwarekomponenten, ihre Schnittstellen, sowie Abhängigkeiten.
+
+Die Software wird aktuell aus den folgenden Komponenten zusammengestellt:
+
+//TODO
+[[Komponentendiagramm]] 
+image::./models/analysis/Komponentendiagramm.png[Komponentendiagramm, 100%, 100%, pdfwidth=100%, title= "Komponentendiagramm von {project_name}", align=center, caption="Abbildung 1: "]
+
+
+// Beschreibung des Komponentendiagramms kommt hier
+
+
+== Anwendungsfälle
+In diesem Abschnitt werden die grundlegenden Funktionalitäten der Anwendung
+in Form von Anwendungsfällen übersichtlich für alle Anwendergruppen aufgeführt.
+Es wird zudem eine klare Abgrenzung zwischen den zur Anwendung gehörigen und nicht 
+gehörigen Funktionalitäten gemacht. Darüber hinaus werden auch Beziehungen zwischen 
+den Anwendungsfällen mit aufgenommen.
+
+=== Akteure
+Zunächst erfolgt eine klare Definition aller Akteure, die die Anwendung nutzen sollen, und deren
+Interessen bei der Gestaltung der Anwendungsfälle eine wesentliche Rolle spielen.
+Die Akteure sind folgender Tabelle zu entnehmen. Dabei beschreiben kursiv gestaltete Akteure
+zusätzlich eine hierarchische Gruppierung mehrerer, untergeordneter Akteure.  
+
+[options="header",cols="30%,70%"]
+|===
+|Name                       |Beschreibung
+|_Auftraggeber_  			|Person, die das Softwaretool abnimmt
+|===
+
+=== Überblick Anwendungsfalldiagramm
+
+//TODO
+[[Anwendungsfalldiagramm]]
+image::./models/analysis/Anwendungsfalldiagramm.png[Anwendungsfalldiagramm, 100%, 100%, pdfwidth=100%, title= "Anwendungsfalldiagramm von {project_name}", align=center, caption="Abbildung 2: "]
+
+=== Anwendungsfallbeschreibungen
+
+[cols="20%h, 80%"]
+[[UC0100]]
+|===
+|ID                         |**<<UC0100>>**
+|Name                       |Logdatei mit URLs
+|Beschreibung               |an einem Stichtag sollen die URLs der Landkreisliste, nach Wikipedia, in eine
+Logdatei importiert werden. Ebenfalls soll sich das Datum und die Urhzeit im Ordnername befinden.
+|Vorbedingungen            a|-
+|Schritte                  a|
+1. aufrufen der Wikipediaseite der Landkreisliste
+2. importieren der URLs in eine Logdatei
+3. Bennenung der Datei mit Datum und Uhrzeit
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0100>>
+|===
+
+[cols="20%h, 80%"]
+[[UC0101]]
+|===
+|ID                         |**<<UC0101>>**
+|Name                       |Crawler
+|Beschreibung               |ein zeitgesteuerter Crawler der nicht als BOT erkannt wird und gezielt Websites
+aufrufen kann und davon gezielt Daten extrahiert. Diese Daten werden in eine Logdatei vermerkt
+|Vorbedingungen            a|
+* eine Logdatei mit URLs liegt vor
+|Schritte                  a|
+1. greift auf die Logdatei mit den URLs zu
+2. besucht nacheinander die Websites
+3. extrahiert gewünschte Daten ohne als BOT erkannt zu werden
+4. legt eine Logdatei names „Landkreisseitenstatistik“ mit Datum und Uhrzeit an
+5. speichert die einzelnen Daten in der „Landkreisseitenstatistik“-Datei
+6. fügt alle einzelstatistiken in eine „Landkreiswebsitegesamtstatistik“-Datei pro Landkreis zusammen
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0101>> <<AF0102>> <<AF0103>> 
+|===
+
+[cols="20%h, 80%"]
+[[UC0102]]
+|===
+|ID                         |**<<UC0102>>**
+|Name                       |Crawler-Daten
+|Beschreibung               |die zu erhebenen Daten mittels des Crawlers werden hier beschrieben
+|Vorbedingungen            a|
+* ein Crawler kann Landkreiswebsites aufrufen
+* der Crawler kann gezielt Daten erheben
+|Schritte                  a|
+1. erheben der Anzahl der Daten von:
+    a) „Informationsobjekten“ mit wahrscheinlichem Raumbezug
+    b) interaktiven, eingebetteten Karten
+    c) extern verlinkten Karten
+    d) Adressangaben (indirekter Raumbezug)
+    e) Koordinaten
+    f) E-Services direkt auf dieser Seite
+    g) Links auf E-Services auf dieser Seite
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0104>>
+|===
+
+[cols="20%h, 80%"]
+[[UC0103]]
+|===
+|ID                         |**<<UC0103>>**
+|Name                       |Datenanreicherung
+|Beschreibung               |die Anreicherung der "Landkreiswebsitegesamtstatistik" um weitere Metadatenfelder 
+pro Datensatz
+|Vorbedingungen            a|
+* ein Crawler hat alle Daten vorher erhoben
+* Die Daten wurden in eine Logdatei geschrieben
+|Schritte                  a|
+1. anreichern der vorhandenen "Landkreiswebsitegesamtstatistik" um:
+    a) Bundesland
+    b) Flächengröße in qkm
+    c) Anzahl in Einwohner
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0105>>
+|===
+
+//TODO selber Entscheiden wo ein Sequenzdiagramm angemessen ist :)
+[[/* INSERT NAME HERE */]]
+image::./models/analysis/Sequenzdiagramme/INSERT_NAME_HERE[/* SAME AS HEADER */, 80%, 80%, pdfwidth=80%, title= "Sequenzdiagramm zu << /* INSERT ID HERE */>>", align=center, caption="Abbildung 3: "]
+
+== Funktionale Anforderungen
+In diesem Abschnitt erfolgt eine Übersicht über alle funktionalen Anforderungen an den GeoContentAnalyser.
+Die Anforderungen werden zur besseren Zuordnung im weiteren Projektverlauf mit einer ID versehen und versioniert.
+Zudem erfolgt über die Angabe der Kategorie nach der MoSCoW-Methode (M - Must, S - Should, C - Could, W - Won't)
+eine grobe Priorisierung der einzelnen Anforderungen, die bei der Implementierung zu berücksichtigen ist.
+
+[options="header", cols="11%h, ^10%, 17%, ^12%, 50%"]
+|===
+|ID
+|Version
+|Name
+|Kategorie
+|Beschreibung
+
+|[[AF0100]]<<AF0100>>
+|v1.0
+|Logdatei mit URLs
+|M
+a|Die Logdatei soll mit dem Datum/Uhrzeit benannt werden, an dem die Datei erstellt wurde.
+
+|[[AF0101]]<<AF0101>>
+|v1.0
+|Crawler
+|M
+a|Der Crawler soll zeitgesteuert sein, darf nicht als BOT erkannt werden und muss in der lage sein die URLs
+aus der bereits erstellten Logdatei auslesen und aufrufen zu können.
+
+|[[AF0102]]<<AF0102>>
+|v1.0
+|Crawler-Speicherort
+|M
+a|Der Crawler soll die erhobenen Daten in Logdatein mit dem Namen „Landkreisseitenstatistik“ speichern.
+
+|[[AF0103]]<<AF0103>>
+|v1.0
+|Crawler-Ergebnisg
+|M
+a|Die Daten die der Crawler von einem Link erhoben hat soll in einer Logdatei, mit dem Namen 
+„Landkreiswebsitegesamtstatistik“ + Datum/Uhrzeit, zusammengeführt werden.
+
+|[[AF0104]]<<AF0104>>
+|v1.0
+|Crawler-Daten
+|M
+a|Die Daten die der Crawler erheben soll werden klar beschrieben.
+
+|[[AF0105]]<<AF0105>>
+|v1.0
+|Datenanreicherung
+|M
+a|Alle erhobenen Metadaten sollen um definierte Daten erweitert werden.
+|===
+
+== Nicht-Funktionale Anforderungen
+In Abgrenzung zu den funktionalen Anforderungen werden im Folgenden die nicht-funktionalen Anforderungen erfasst.
+Bei diesen handelt es sich um Anforderungen, welche an die Anwendung als Ganzes gestellt werden. Nicht-funktionale
+Anforderungen können sich dabei gegenseitig beeinflussen.
+
+Die gegenseitige Beeinflussung führt dazu, dass Entscheidungen getroffen werden müssen, welcher nicht-funktionalen
+Anforderung gegebenenfalls Vorrang vor einer anderen einzuräumen ist. Die Qualitätsmerkmale der zu erstellenden
+Anwendung und ihre Wichtigkeit (von 1 = geringe Wichtigkeit bis 5 = hohe Wichtigkeit), die für eine Entscheidungsfindung 
+herangezogen werden sollen, lauten wie folgt:  
+
+[options="header", cols="3h, ^1, ^1, ^1, ^1, ^1"]
+|===
+|Qualitätsmerkmal  | 1 | 2 | 3 | 4 | 5
+|Bedienbarkeit     |   |   |   | x |
+|Sicherheit        | x |   |   |   |
+|Zuverlässigkeit   |   |   |   |   | x
+|Wartbarkeit       |   | x |   |   |
+|Erweiterbarkeit   | x |   |   |   |
+|===
+
+Die für die Anwendung erforderlichen nicht-funktionalen Anforderungen ergeben sich laut Übersicht:
+
+[options="header", cols="2h, ^1, 3, 12"]
+|===
+|ID
+|Ver- sion
+|Name
+|Beschreibung
+
+|[[AN0100]]<<AN0100>>
+|v1.0
+|Data Storage
+|Die Daten sollen als File im Format Markdown Table in einem konfigurierbaren Datenverzeichnis gespeichert sein.
+
+|[[AN0101]]<<AN0101>>
+|v1.0
+|Anwendung
+|Die Software soll eine JAVA-Konsolenanwendung sein.
+
+|[[AN0102]]<<AN0102>>
+|v1.0
+|Open-Source (optional)
+|Die Software soll ein Open-Source-Projekt auf HitHub sein. 
+|===
+
+== Datenmodell
+
+=== Überblick: Klassendiagramm
+Ein Klassendiagramm beschreibt Systeme, indem es Klassen, deren Attribute und Operationen sowie die Beziehungen 
+zwischen den Klassen aufzeigt.
+
+//TODO
+image::./models/analysis/Klassendiagramm.png[Klassendiagramm,1201,800, pdfwidth=100%, title= "Klassendiagramm von {project_name}", align=center, caption="Abbildung 18: "]
+
+=== Klassen und Enumerationen
+
+//TODO
+[options="header", cols="1h, 4"]
+|===
+|Klasse           |Beschreibung
+
+|===
+== Akzeptanztestfälle
+In diesem Abschnitt werden Testfälle angegeben, um die fertige Anwendung auf die Erfüllung der funktionalen und 
+nicht-funktionalen Anforderungen hin zu überprüfen. Dazu werden die bereits ausformulierten Anwendungsfälle zur
+Grundlage gemacht und vordefinierte Eingaben und Handlungsfolgen daraufhin abgetestet. Aus den Testfällen wird im 
+späteren Verlauf ein Testplan erstellt, der die Testausführung präzisiert und als Vorgabe für die Tests der Endnutzer 
+dient.
+
+//TODO (mach ich vieleicht selber)
+
+== Glossar
+Das Glossar beinhaltet sämtliche Begriffe, die innerhalb des Projektes verwendet werden und deren gemeinsames 
+Verständnis aller beteiligten Stakeholder essentiell ist.
+
