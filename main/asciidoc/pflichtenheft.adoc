@@ -5,8 +5,8 @@
 [options="header"]
 [cols="10%, 15%, 20%, 15%, 40%"]
 |===
-|Version| Status    | Bearbeitungs- datum | Autoren(en)    |  Vermerk
-|0.1    | In Arbeit | 07.05.2023        | Leon Kunze         | Initiale Version
+|Version| Status    | Bearbeitungsdatum | Autoren(en)        |  Vermerk
+|0.1    | In Arbeit | 09.05.2023        | Leon Kunze         | Initiale Version
 |===
 
 == Zusammenfassung
@@ -116,53 +116,212 @@ image::./models/analysis/Anwendungsfalldiagramm.png[Anwendungsfalldiagramm, 100%
 
 === Anwendungsfallbeschreibungen
 
-//TODO continiue here
 [cols="20%h, 80%"]
 [[UC0100]]
 |===
 |ID                         |**<<UC0100>>**
-|Name                       |Login/Logout
-|Beschreibung               |ein Nutzer muss sich in der Anwendung anmelden (Login), um Zugriff auf +
-die Funktionalitäten im geschlossenen Bereich zu erhalten. Eine Abmeldung (Logout) soll diesen
-Zugriff wieder beenden
-|Akteur                     |Nutzer
-|Auslöser                  a|
-* Login: Nutzer möchte die Funktionalitäten der Anwendung nutzen
-* Logout: Nutzer möchte die Anwendung verlassen
-|Vorbedingungen            a|
-* Login: Nutzer ist noch nicht in der Anwendung angemeldet
-* Logout: Nutzer ist angemeldet
-|Schritte                   a|
-* Login: +
-1. Nutzer drückt den Button "Einloggen" in der Navigationsleiste auf der Startseite +
-2. Nutzer gibt seinen Nutzernamen und sein Passwort in das Dialogfeld ein +
-3. Nutzer drückt Button "Einloggen"
-* Logout: + 
-1. Nutzer drückt den Button "Ausloggen" in der Navigationsleiste auf der Startseite
+|Name                       |Logdatei mit URLs
+|Beschreibung               |an einem Stichtag sollen die URLs der Landkreisliste, nach Wikipedia, in eine
+Logdatei importiert werden. Ebenfalls soll sich das Datum und die Urhzeit im Ordnername befinden.
+|Vorbedingungen            a|-
+|Schritte                  a|
+1. aufrufen der Wikipediaseite der Landkreisliste
+2. importieren der URLs in eine Logdatei
+3. Bennenung der Datei mit Datum und Uhrzeit
 |Erweiterungen              |-
-|Funktionale Anforderungen  |<<AF0100>> <<AF0101>>
+|Funktionale Anforderungen  |<<AF0100>>
 |===
 
-//TODO
+[cols="20%h, 80%"]
+[[UC0101]]
+|===
+|ID                         |**<<UC0101>>**
+|Name                       |Crawler
+|Beschreibung               |ein zeitgesteuerter Crawler der nicht als BOT erkannt wird und gezielt Websites
+aufrufen kann und davon gezielt Daten extrahiert. Diese Daten werden in eine Logdatei vermerkt
+|Vorbedingungen            a|
+* eine Logdatei mit URLs liegt vor
+|Schritte                  a|
+1. greift auf die Logdatei mit den URLs zu
+2. besucht nacheinander die Websites
+3. extrahiert gewünschte Daten ohne als BOT erkannt zu werden
+4. legt eine Logdatei names „Landkreisseitenstatistik“ mit Datum und Uhrzeit an
+5. speichert die einzelnen Daten in der „Landkreisseitenstatistik“-Datei
+6. fügt alle einzelstatistiken in eine „Landkreiswebsitegesamtstatistik“-Datei pro Landkreis zusammen
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0101>> <<AF0102>> <<AF0103>> 
+|===
+
+[cols="20%h, 80%"]
+[[UC0102]]
+|===
+|ID                         |**<<UC0102>>**
+|Name                       |Crawler-Daten
+|Beschreibung               |die zu erhebenen Daten mittels des Crawlers werden hier beschrieben
+|Vorbedingungen            a|
+* ein Crawler kann Landkreiswebsites aufrufen
+* der Crawler kann gezielt Daten erheben
+|Schritte                  a|
+1. erheben der Anzahl der Daten von:
+    a) „Informationsobjekten“ mit wahrscheinlichem Raumbezug
+    b) interaktiven, eingebetteten Karten
+    c) extern verlinkten Karten
+    d) Adressangaben (indirekter Raumbezug)
+    e) Koordinaten
+    f) E-Services direkt auf dieser Seite
+    g) Links auf E-Services auf dieser Seite
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0104>>
+|===
+
+[cols="20%h, 80%"]
+[[UC0103]]
+|===
+|ID                         |**<<UC0103>>**
+|Name                       |Datenanreicherung
+|Beschreibung               |die Anreicherung der "Landkreiswebsitegesamtstatistik" um weitere Metadatenfelder 
+pro Datensatz
+|Vorbedingungen            a|
+* ein Crawler hat alle Daten vorher erhoben
+* Die Daten wurden in eine Logdatei geschrieben
+|Schritte                  a|
+1. anreichern der vorhandenen "Landkreiswebsitegesamtstatistik" um:
+    a) Bundesland
+    b) Flächengröße in qkm
+    c) Anzahl in Einwohner
+|Erweiterungen              |-
+|Funktionale Anforderungen  |<<AF0105>>
+|===
+
+//TODO selber Entscheiden wo ein Sequenzdiagramm angemessen ist :)
 [[/* INSERT NAME HERE */]]
-image::./models/analysis/Sequenzdiagramme/Auftritt_buchen.png[/* SAME AS HEADER */, 80%, 80%, pdfwidth=80%, title= "Sequenzdiagramm zu << /* INSERT ID HERE */>>", align=center, caption="Abbildung 3: "]
+image::./models/analysis/Sequenzdiagramme/INSERT_NAME_HERE[/* SAME AS HEADER */, 80%, 80%, pdfwidth=80%, title= "Sequenzdiagramm zu << /* INSERT ID HERE */>>", align=center, caption="Abbildung 3: "]
 
 == Funktionale Anforderungen
+In diesem Abschnitt erfolgt eine Übersicht über alle funktionalen Anforderungen an den GeoContentAnalyser.
+Die Anforderungen werden zur besseren Zuordnung im weiteren Projektverlauf mit einer ID versehen und versioniert.
+Zudem erfolgt über die Angabe der Kategorie nach der MoSCoW-Methode (M - Must, S - Should, C - Could, W - Won't)
+eine grobe Priorisierung der einzelnen Anforderungen, die bei der Implementierung zu berücksichtigen ist.
+
+[options="header", cols="11%h, ^10%, 17%, ^12%, 50%"]
+|===
+|ID
+|Version
+|Name
+|Kategorie
+|Beschreibung
+
+|[[AF0100]]<<AF0100>>
+|v1.0
+|Logdatei mit URLs
+|M
+a|Die Logdatei soll mit dem Datum/Uhrzeit benannt werden, an dem die Datei erstellt wurde.
+
+|[[AF0101]]<<AF0101>>
+|v1.0
+|Crawler
+|M
+a|Der Crawler soll zeitgesteuert sein, darf nicht als BOT erkannt werden und muss in der lage sein die URLs
+aus der bereits erstellten Logdatei auslesen und aufrufen zu können.
+
+|[[AF0102]]<<AF0102>>
+|v1.0
+|Crawler-Speicherort
+|M
+a|Der Crawler soll die erhobenen Daten in Logdatein mit dem Namen „Landkreisseitenstatistik“ speichern.
+
+|[[AF0103]]<<AF0103>>
+|v1.0
+|Crawler-Ergebnisg
+|M
+a|Die Daten die der Crawler von einem Link erhoben hat soll in einer Logdatei, mit dem Namen 
+„Landkreiswebsitegesamtstatistik“ + Datum/Uhrzeit, zusammengeführt werden.
+
+|[[AF0104]]<<AF0104>>
+|v1.0
+|Crawler-Daten
+|M
+a|Die Daten die der Crawler erheben soll werden klar beschrieben.
+
+|[[AF0105]]<<AF0105>>
+|v1.0
+|Datenanreicherung
+|M
+a|Alle erhobenen Metadaten sollen um definierte Daten erweitert werden.
+|===
 
 == Nicht-Funktionale Anforderungen
+In Abgrenzung zu den funktionalen Anforderungen werden im Folgenden die nicht-funktionalen Anforderungen erfasst.
+Bei diesen handelt es sich um Anforderungen, welche an die Anwendung als Ganzes gestellt werden. Nicht-funktionale
+Anforderungen können sich dabei gegenseitig beeinflussen.
 
-== GUI Prototyp
+Die gegenseitige Beeinflussung führt dazu, dass Entscheidungen getroffen werden müssen, welcher nicht-funktionalen
+Anforderung gegebenenfalls Vorrang vor einer anderen einzuräumen ist. Die Qualitätsmerkmale der zu erstellenden
+Anwendung und ihre Wichtigkeit (von 1 = geringe Wichtigkeit bis 5 = hohe Wichtigkeit), die für eine Entscheidungsfindung 
+herangezogen werden sollen, lauten wie folgt:  
 
-=== Überblick: Dialoglandkarte
+[options="header", cols="3h, ^1, ^1, ^1, ^1, ^1"]
+|===
+|Qualitätsmerkmal  | 1 | 2 | 3 | 4 | 5
+|Bedienbarkeit     |   |   |   | x |
+|Sicherheit        | x |   |   |   |
+|Zuverlässigkeit   |   |   |   |   | x
+|Wartbarkeit       |   | x |   |   |
+|Erweiterbarkeit   | x |   |   |   |
+|===
 
-=== Dialogbeschreibung
+Die für die Anwendung erforderlichen nicht-funktionalen Anforderungen ergeben sich laut Übersicht:
+
+[options="header", cols="2h, ^1, 3, 12"]
+|===
+|ID
+|Ver- sion
+|Name
+|Beschreibung
+
+|[[AN0100]]<<AN0100>>
+|v1.0
+|Data Storage
+|Die Daten sollen als File im Format Markdown Table in einem konfigurierbaren Datenverzeichnis gespeichert sein.
+
+|[[AN0101]]<<AN0101>>
+|v1.0
+|Anwendung
+|Die Software soll eine JAVA-Konsolenanwendung sein.
+
+|[[AN0102]]<<AN0102>>
+|v1.0
+|Open-Source (optional)
+|Die Software soll ein Open-Source-Projekt auf HitHub sein. 
+|===
 
 == Datenmodell
 
 === Überblick: Klassendiagramm
+Ein Klassendiagramm beschreibt Systeme, indem es Klassen, deren Attribute und Operationen sowie die Beziehungen 
+zwischen den Klassen aufzeigt.
+
+//TODO
+image::./models/analysis/Klassendiagramm.png[Klassendiagramm,1201,800, pdfwidth=100%, title= "Klassendiagramm von {project_name}", align=center, caption="Abbildung 18: "]
 
 === Klassen und Enumerationen
 
+//TODO
+[options="header", cols="1h, 4"]
+|===
+|Klasse           |Beschreibung
+
+|===
 == Akzeptanztestfälle
+In diesem Abschnitt werden Testfälle angegeben, um die fertige Anwendung auf die Erfüllung der funktionalen und 
+nicht-funktionalen Anforderungen hin zu überprüfen. Dazu werden die bereits ausformulierten Anwendungsfälle zur
+Grundlage gemacht und vordefinierte Eingaben und Handlungsfolgen daraufhin abgetestet. Aus den Testfällen wird im 
+späteren Verlauf ein Testplan erstellt, der die Testausführung präzisiert und als Vorgabe für die Tests der Endnutzer 
+dient.
+
+//TODO (mach ich vieleicht selber)
 
 == Glossar
+Das Glossar beinhaltet sämtliche Begriffe, die innerhalb des Projektes verwendet werden und deren gemeinsames 
+Verständnis aller beteiligten Stakeholder essentiell ist.
+
