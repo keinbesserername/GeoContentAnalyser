@@ -14,6 +14,7 @@ import org.jsoup.select.Elements;
 public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
+    String fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
@@ -33,13 +34,16 @@ public class SiteURLExtractor implements Runnable {
 
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", true);
+            FileWriter writer = new FileWriter("output/" + fileName + ".txt", true);
             for (String link : localresultURLs) {
                 writer.write(link + "\n");
             }
             writer.close();
         } catch (IOException e) {
         }
+
+        // filter the document
+        filter(doc);
 
         // if recursive depth is less than 4, call recursive function
         if (recursiveDepth <= 4) {
@@ -88,7 +92,7 @@ public class SiteURLExtractor implements Runnable {
     public void run() {
         // remove the previous output file
         try {
-            FileWriter writer = new FileWriter("output/" + baseURL + ".txt", false);
+            FileWriter writer = new FileWriter("output/" + fileName + ".txt", false);
             writer.close();
         } catch (IOException e) {
         }
@@ -98,6 +102,14 @@ public class SiteURLExtractor implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void filter(Document doc) {
+        // Insert whatever filter you want here
+        // This function presents a HTML file formatted as a JSoup document
+        // You can use the JSoup API to filter the document
+        // Just call it here
+
     }
 
 }

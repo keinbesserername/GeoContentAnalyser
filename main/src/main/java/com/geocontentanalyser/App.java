@@ -14,10 +14,9 @@ public class App {
     public static void main(String[] args) throws IOException {
         List<String> wikiURLlList = WikiScrapperMain.crawler();
 
-        for (String URL : wikiURLlList) {
-            SiteURLExtractor siteURLExtractor = new SiteURLExtractor(URL);
-            Thread thread = new Thread(siteURLExtractor);
-            thread.start();
-        }
+        //change the URL to the one you want to scrape, manually
+        //depth must be 0
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor("https://www.saalekreis.de/");
+        siteURLExtractor.extractURL("https://www.saalekreis.de/", 0);
     }
 }
