@@ -1,0 +1,30 @@
+= Protokoll Gruppe 2
+
+Treffen am 16.05.2023
+
+Ort:      BigBlueButton +
+Beginn:   15:21 Uhr +
+Ende:     15:25 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+16.05.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Duc Hieu Le
+- Leon Kunze
+- Andrii Roshkovan
+
+== Bemerkungen
+- Astrid konnte nicht kommen
+
+== Retrospektive des letzten Sprints
+
+== Aktueller Stand
+- Leon fürht die Literatur Search durch
+- Le ist fast fertig
+- Andrii gab es kleinere Probleme
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung werden weiterhin, wie am 25.04.2023 besprochen, bearbeitet
