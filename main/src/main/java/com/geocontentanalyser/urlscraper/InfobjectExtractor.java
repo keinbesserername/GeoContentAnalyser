@@ -24,7 +24,7 @@ public class InfobjectExtractor{
     String title, url, address, email, telephone, open_times;
 
     //list of found containers, not to search for them multiple times
-    Elements containers = new Elements();
+    Elements containers, text_tags;
 
     InfobjectExtractor(){
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
@@ -38,10 +38,11 @@ public class InfobjectExtractor{
         this.telephone =  "|Telephone   | ";
         this.open_times = "|Open times  | ";
 
-        this.containers = new Elements();
-        Elements all_containers = this.doc.select("span,td,div");
+        this.containers = this.doc.select("span,td,div");
+        this.text_tags = this.doc.select("p,span,text");
+        /*
         ArrayList<Integer> indexes = new ArrayList<Integer>();
-       
+        
         for(Element container : all_containers){
             if(container.select("head,body,title,main,nav,footer,header").isEmpty()){
                 indexes.add(all_containers.indexOf(container));
@@ -54,6 +55,8 @@ public class InfobjectExtractor{
         for(Integer index : indexes){
             this.containers.add(all_containers.get(index));
         }
+        */        
+
     }
 
     private String findTitle(Document doc){
@@ -162,29 +165,36 @@ public class InfobjectExtractor{
     }
 
     private String findOpenTimes(){
-        for(Element element : this.containers){
+        for(Element element : this.text_tags){
             //searching through all containers on page
             Pattern pattern = Pattern.compile("(Ö|ö)ffnungszeiten");
             Matcher matcher = pattern.matcher(element.text());
             if(matcher.find()){
                 //if found, see if the whole open time is in container
-                pattern = Pattern.compile("Öffnungszeiten(\s|\n)*((Mo|Di|Mi|Do|Fr|Sa|So).{15,40}\n)+", Pattern.CASE_INSENSITIVE);
+                pattern = Pattern.compile("Öffnungszeiten(\s|\n)*((Mo|Di|Mi|Do|Fr|Sa|So).{10,45}Uhr(\n|\s))+", Pattern.CASE_INSENSITIVE);
                 matcher = pattern.matcher(element.text());
                 if(matcher.find()){
-                    return matcher.group(0).replace("(Ö|ö)ffnungszeiten( |)", "");
+                    return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
                 }else{
                     //if not in the container itself, search through parent element
                     matcher = pattern.matcher(element.parent().text());
                     if(matcher.find()){
-                        return matcher.group(0).replace("(Ö|ö)ffnungszeiten( |)", "");
+                        return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
+                    }else{
+                        matcher = pattern.matcher(element.parent().parent().text());
+                        if(matcher.find()){
+                            return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
+                        }
+                        /*
+                        else{
+                            //if no success, just drop everything in the parent element
+                            return element.parent().text().replace("(Ö|ö)ffnungszeiten( |)", "");
+
+                            //if no success, just drop everything in the element
+                            return element.text().replace("(Ö|ö)ffnungszeiten( |)", "");
+                        }
+                        */
                     }
-                    else{
-                        //if no success, just drop everything in the parent element
-                        //return element.parent().text().replace("(Ö|ö)ffnungszeiten( |)", "");
-                        //if no success, just drop everything in the element
-                        return element.text().replace("(Ö|ö)ffnungszeiten( |)", "");
-                    }
-                    
                 }
             }
         }
