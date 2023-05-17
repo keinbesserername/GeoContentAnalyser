@@ -14,7 +14,7 @@ public class WikiScrapperMain {
     // Temporary file writing. Will be replaced in later interations
     public static void printToFile(String name, String url, String fileName) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("output/" + fileName + ".log", true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("main/output/" + fileName + ".log", true));
 
             writer.write("|" + name + "|" + url + "|");
             writer.newLine();

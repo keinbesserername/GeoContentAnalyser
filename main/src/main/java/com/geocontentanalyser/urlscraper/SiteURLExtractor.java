@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
@@ -14,17 +15,20 @@ import org.jsoup.select.Elements;
 public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
-    String fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
+    String fileName;
+    InfobjectExtractor infobjectExtractor;
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
+        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
+        this.infobjectExtractor = new InfobjectExtractor();
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
 
         // parse content into HTML
-        Document doc = Jsoup.connect(URL).get();
+        Document doc = Jsoup.connect(URL).timeout(6000).get();
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
@@ -34,8 +38,8 @@ public class SiteURLExtractor implements Runnable {
 
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", true);
-            for (String link : localresultURLs) {
+            FileWriter writer = new FileWriter("main/output/" + fileName + ".txt", true);
+            for (String link : localresultURLs){
                 writer.write(link + "\n");
             }
             writer.close();
@@ -92,7 +96,7 @@ public class SiteURLExtractor implements Runnable {
     public void run() {
         // remove the previous output file
         try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", false);
+            FileWriter writer = new FileWriter("main/output/" + fileName + ".txt", false);
             writer.close();
         } catch (IOException e) {
         }
@@ -104,12 +108,8 @@ public class SiteURLExtractor implements Runnable {
         }
     }
 
-    public void filter(Document doc) {
-        // Insert whatever filter you want here
-        // This function presents a HTML file formatted as a JSoup document
-        // You can use the JSoup API to filter the document
-        // Just call it here
-
+    public void filter(Document doc) {       
+        this.infobjectExtractor.extract(doc);
     }
 
 }
