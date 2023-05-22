@@ -35,7 +35,7 @@ public class SiteURLExtractor implements Runnable {
 
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", true);
+            FileWriter writer = new FileWriter("output/site" + fileName + ".txt", true);
             for (String link : localresultURLs) {
                 writer.write(link + "\n");
             }
@@ -93,7 +93,7 @@ public class SiteURLExtractor implements Runnable {
     public void run() {
         // remove the previous output file
         try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", false);
+            FileWriter writer = new FileWriter("output/site" + fileName + ".txt", false);
             writer.close();
         } catch (IOException e) {
         }
