@@ -20,29 +20,21 @@ public class SiteURLExtractor implements Runnable {
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
         // remove http:// or https:// from the baseURL
-        this.fileName = baseURL.replace("https://", "").replace("http://", "");
+        this.fileName = baseURL.replace("www.", "").replace("https://", "")
+                .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
 
         Document doc = null;
-
-        int breakLoop = 0;
-        while (breakLoop < 3) {
-            Connection connection = Jsoup.connect(URL).followRedirects(true);
-            connection.userAgent(
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
-            connection.timeout(5000);
-            if (connection.execute().statusCode() > 200) {
-                breakLoop++;
-            } else {
-                // parse content into HTML document
-                doc = connection.get();
-                break;
-            }
-        }
         
+        Connection connection = Jsoup.connect(URL).followRedirects(true)
+        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
+        .timeout(5000);
+        
+        // parse content into HTML document
+        doc = connection.get();
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
@@ -76,8 +68,8 @@ public class SiteURLExtractor implements Runnable {
         Iterator<Element> it = links.iterator();
         while (it.hasNext()) {
             Element link = it.next();
-            // check if contain javascript, #, mailto, or not html, not baseURL, or already
-            // exist in resultURLs
+            // check if contain javascript, #, mailto, or not html, not baseURL
+            // have any extension, or already exist in resultURLs
             String linkString = trackerStripper(link.attr("abs:href"));
             if (linkString.contains("javascript") || linkString.contains("#")
                     || linkString.contains("mailto") || !linkString.contains("html")
@@ -106,7 +98,7 @@ public class SiteURLExtractor implements Runnable {
         writeToFile(false, null);
         try {
             extractURL(baseURL, 0);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
