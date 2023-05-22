@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
@@ -18,14 +19,30 @@ public class SiteURLExtractor implements Runnable {
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
-        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
+        // remove http:// or https:// from the baseURL
+        this.fileName = baseURL.replace("https://", "").replace("http://", "");
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
 
-        // parse content into HTML
-        Document doc = Jsoup.connect(URL).get();
+        Document doc = null;
+
+        int breakLoop = 0;
+        while (breakLoop < 3) {
+            Connection connection = Jsoup.connect(URL).followRedirects(true);
+            connection.userAgent(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
+            connection.timeout(5000);
+            if (connection.execute().statusCode() > 200) {
+                breakLoop++;
+            } else {
+                // parse content into HTML document
+                doc = connection.get();
+                break;
+            }
+        }
+        
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
@@ -34,14 +51,7 @@ public class SiteURLExtractor implements Runnable {
         resultURLs.addAll(localresultURLs);
 
         // write links to file
-        try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", true);
-            for (String link : localresultURLs) {
-                writer.write(link + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-        }
+        writeToFile(true, localresultURLs);
 
         // filter the document
         filter(doc);
@@ -68,9 +78,10 @@ public class SiteURLExtractor implements Runnable {
             Element link = it.next();
             // check if contain javascript, #, mailto, or not html, not baseURL, or already
             // exist in resultURLs
-            if (link.attr("href").contains("javascript") || link.attr("href").contains("#")
-                    || link.attr("href").contains("mailto") || !link.attr("href").contains("html")
-                    || !link.attr("abs:href").contains(baseURL) || resultURLs.contains(link.attr("abs:href"))) {
+            String linkString = trackerStripper(link.attr("abs:href"));
+            if (linkString.contains("javascript") || linkString.contains("#")
+                    || linkString.contains("mailto") || !linkString.contains("html")
+                    || !linkString.contains(baseURL) || resultURLs.contains(linkString)) {
                 it.remove();
             }
         }
@@ -92,17 +103,33 @@ public class SiteURLExtractor implements Runnable {
     @Override
     public void run() {
         // remove the previous output file
-        try {
-            FileWriter writer = new FileWriter("output/" + fileName + ".txt", false);
-            writer.close();
-        } catch (IOException e) {
-        }
-
+        writeToFile(false, null);
         try {
             extractURL(baseURL, 0);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void writeToFile(boolean append, ArrayList<String> localresultURLs) {
+        // write links to file
+        try {
+            FileWriter writer = new FileWriter("output/site/" + fileName + ".txt", append);
+            if (localresultURLs != null) {
+                for (String link : localresultURLs) {
+                    writer.write(link + "\n");
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+        }
+    }
+
+    public String trackerStripper(String link) {
+        // strip everything after the ? in the link
+        String[] linkParts = link.split("\\?");
+        link = linkParts[0];
+        return link;
     }
 
     public void filter(Document doc) {
