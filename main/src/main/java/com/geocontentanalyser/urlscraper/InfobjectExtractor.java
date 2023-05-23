@@ -2,6 +2,7 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.time.Instant;
 import java.util.regex.Pattern;
 
@@ -13,7 +14,12 @@ import org.jsoup.select.Elements;;
 
 public class InfobjectExtractor{
     Document doc;
+    //infobject files' names are unique
     String time;
+    //keeps track of number of found infobjects
+    Integer infobject_counter = 0;
+    //name of current landkreis
+    String current_landkreis;
 
     //keeping track of what's been found, not to allow dublicates
     ArrayList<String> found_addresses= new ArrayList<String>();
@@ -235,7 +241,7 @@ public class InfobjectExtractor{
 
     public void extract(Document doc){
         this.doc = doc;
-        String[] infobjects = {"museum", "kirche", "schule", "amt_"};
+        String[] infobjects = {"museum", "kirche", "schule_", "amt_"};
         for(String item : infobjects){
             if(this.doc.location().contains(item)){
                 //return parameters to default
@@ -262,10 +268,21 @@ public class InfobjectExtractor{
                     if(telephone == "|Telephone   | "){
                         this.telephone += this.findTelephone(doc.text());
                     } 
+                    
+                    //incrementing the infobject counter
+                    infobject_counter++;
+                    try{
+                        RandomAccessFile file = new RandomAccessFile("output/" + this.time + "-infobject.txt", "rw");
+                        byte[] bytes = ("\nInfobjects Found: " + infobject_counter + "\n\n\n").getBytes();
+                        file.write(bytes, 0, bytes.length);
+                        file.close();
+                    }
+                    catch(IOException e){
+                    }
 
                     //writing the found in the file
                     try {
-                        FileWriter writer = new FileWriter("main/output/" + this.time + "-infobject.txt", true);
+                        FileWriter writer = new FileWriter("output/" + this.time + "-infobject.txt", true);
                         //separator
                         writer.write("/------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
                         //header
