@@ -17,6 +17,6 @@ public class App {
         //change the URL to the one you want to scrape, manually
         //depth must be 0
         SiteURLExtractor siteURLExtractor = new SiteURLExtractor("https://www.saalekreis.de/");
-        siteURLExtractor.extractURL("https://www.saalekreis.de/", 4);
+        siteURLExtractor.extractURL("https://www.saalekreis.de/", 1);
     }
 }

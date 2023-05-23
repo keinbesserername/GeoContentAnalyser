@@ -20,12 +20,15 @@ public class InfobjectExtractor{
     Integer infobject_counter = 0;
     //name of current landkreis
     String current_landkreis;
+    //"simplify" flag is used not to place the output in "capsules" anymore, it is useful for parcing of infobject.txt files (yet to be implemented)
+    Boolean simplify;
 
     //all possible kinds of infobjects
     String[] infobjects = {"museum", "kirche", "schule_", "schule.", "amt_", "amt.", "gymnasium.", "gimnasium_", "dezernat", "wesen", "bau.", "bau_", "zentrum", "einheit", "rat", "tag", "halle"};
 
     //keeping track of what's been found, not to allow dublicates
-    ArrayList<String> found_addresses= new ArrayList<String>();
+    ArrayList<String> found_urls = new ArrayList<String>();
+    ArrayList<String> found_addresses = new ArrayList<String>();
     ArrayList<String> found_emails = new ArrayList<String>();
     ArrayList<String> found_telephones = new ArrayList<String>();
 
@@ -37,8 +40,9 @@ public class InfobjectExtractor{
     //list of found containers, not to search for them multiple times
     Elements containers, text_tags;
 
-    InfobjectExtractor(){
+    InfobjectExtractor(Boolean simplify){
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
+        this.simplify = simplify;
     }        
 
     private void configure(){
@@ -53,6 +57,9 @@ public class InfobjectExtractor{
 
         this.containers = this.doc.select("span,td,div");
         this.text_tags = this.doc.select("p,span,text");
+
+        //add url to the list to avoid dublicates, that can occur if the recursive depth is set as high
+        this.found_urls.add(this.doc.location());
     }
 
     private String findTitle(Document doc){
@@ -214,24 +221,23 @@ public class InfobjectExtractor{
                 this.found_telephones.add(telephone_refined);
                 return telephone_refined.replace(" ", "").replace("-", "").replace("/", "");
             }else{
-                return "not found";
-            }            
-        }else{
-            //trying to find unlabeled telephone 
-            
-            pattern = Pattern.compile("[0-9][0-9\\-\\/\s]{5,15}[0-9]");
-            matcher = pattern.matcher(text);
-            if(matcher.find()){
-                if(!this.found_telephones.contains(matcher.group(0))){
-                    this.found_telephones.add(matcher.group(0));
-                    return matcher.group(0);
+                //trying to find unlabeled telephone 
+                
+                pattern = Pattern.compile("[0-9][0-9\\-\\/\s]{5,15}[0-9]");
+                matcher = pattern.matcher(text);
+                if(matcher.find()){
+                    if(!this.found_telephones.contains(matcher.group(0))){
+                        this.found_telephones.add(matcher.group(0));
+                        return matcher.group(0);
+                    }else{
+                        return "not found";
+                    } 
                 }else{
-                    return "not found";
-                } 
-            }else{
-                return "not found.";
-            }            
-        }
+                    return "not found.";
+                }            
+            }
+        }    
+        return "not found.";
     }
 
     //functions for formalisation of output into infobject.txt
@@ -265,7 +271,7 @@ public class InfobjectExtractor{
     public void extract(Document doc){
         this.doc = doc;        
         for(String item : this.infobjects){
-            if(this.doc.location().contains(item)){
+            if(this.doc.location().contains(item) && !this.found_urls.contains(doc.location())){
                 //return parameters to default
                 this.configure();                
 

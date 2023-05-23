@@ -21,7 +21,7 @@ public class SiteURLExtractor implements Runnable {
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
         this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
-        this.infobjectExtractor = new InfobjectExtractor();
+        this.infobjectExtractor = new InfobjectExtractor(false);
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
