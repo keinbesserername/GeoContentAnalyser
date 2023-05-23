@@ -76,17 +76,9 @@ public class InfobjectExtractor{
 
         //check the presence of <address> tag
         Elements elements = this.doc.select("address");
+        //just carve out everything and leave the word "address" out
         if(!elements.isEmpty()){
-            pattern = Pattern.compile("[A-z|-]{5,}\s[1-9]+\s+[0-9]{5}(\s|)[A-Z][a-z]*");
-            matcher = pattern.matcher(elements.first().text());
-            if (matcher.find()){
-                //check, if this address was encountered prior
-                if(!this.found_addresses.contains(matcher.group(0))){
-                    return matcher.group(0);
-                }else{
-                    streets.add(matcher.group(0));
-                }                
-            }
+            return elements.get(0).text().replace("(A|a)ddress(\s|\n|)","").replace("(A|a)nschrift(\s|\n|)","");
         }
 
         //if not <address>, search elsewhere
@@ -106,7 +98,7 @@ public class InfobjectExtractor{
 
                 //searching for the direct reference
                 addressContainer = element.parent().text();
-                pattern = Pattern.compile("(((A|a)nschrift)|(Addresse))(.|\n)+");
+                pattern = Pattern.compile("((anschrift)|(addresse))(.|\n)+", Pattern.CASE_INSENSITIVE);
                 matcher = pattern.matcher(addressContainer);
                 if(matcher.find()){
                     street = matcher.group(0);                    
@@ -116,6 +108,18 @@ public class InfobjectExtractor{
                     matcher = pattern.matcher(addressContainer);
                     if(matcher.find()){
                         street = matcher.group()  + " " + index;
+                    }else{
+                        //if pattern of street-naming has not been found, search for more general pattern
+                        pattern = Pattern.compile("[A-z|-]{5,}\s[1-9]+\s+[0-9]{5}(\s|)[A-Z][a-z]*");
+                        matcher = pattern.matcher(elements.first().text());
+                        if (matcher.find()){
+                            //check, if this address was encountered prior
+                            if(!this.found_addresses.contains(matcher.group(0))){
+                                return matcher.group(0);
+                            }else{
+                                streets.add(matcher.group(0));
+                            }                
+                        }
                     }
                 }
 
@@ -208,7 +212,7 @@ public class InfobjectExtractor{
             telephone_refined = matcher.group(0).replaceAll("[A-z]|\\.| {2,}|:", "");
             if(!this.found_telephones.contains(telephone_refined)){
                 this.found_telephones.add(telephone_refined);
-                return telephone_refined;
+                return telephone_refined.replace(" ", "").replace("-", "").replace("/", "");
             }else{
                 return "not found";
             }            
@@ -269,7 +273,7 @@ public class InfobjectExtractor{
                 this.address += this.findAddress(doc);
                 
                 //it is an infobject, only if it has physical address, otherwise, it's a missmatch
-                if(address != "|Address     |"){
+                if(address != "|Address     | "){
 
                     //searching tile
                     this.title += this.findTitle(doc);
