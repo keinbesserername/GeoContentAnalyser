@@ -31,6 +31,8 @@ public class InfobjectExtractor{
 
     //parameters of an infobject                
     String title, url, address, email, telephone, open_times;
+    //biggest length from all of the parameters (for closing bars in infobject.txt; for more info check out draw_right_bar() funciton)
+    Integer biggest_length;
 
     //list of found containers, not to search for them multiple times
     Elements containers, text_tags;
@@ -47,25 +49,10 @@ public class InfobjectExtractor{
         this.telephone =  "|Telephone   | ";
         this.open_times = "|Open times  | ";
 
+        this.biggest_length = this.url.length();
+
         this.containers = this.doc.select("span,td,div");
         this.text_tags = this.doc.select("p,span,text");
-        /*
-        ArrayList<Integer> indexes = new ArrayList<Integer>();
-        
-        for(Element container : all_containers){
-            if(container.select("head,body,title,main,nav,footer,header").isEmpty()){
-                indexes.add(all_containers.indexOf(container));
-            }else{
-                if(container.select("div,span,tb").size() < 3){
-                    indexes.add(all_containers.indexOf(container));
-                }
-            }
-        }
-        for(Integer index : indexes){
-            this.containers.add(all_containers.get(index));
-        }
-        */        
-
     }
 
     private String findTitle(Document doc){
@@ -159,6 +146,7 @@ public class InfobjectExtractor{
     }
 
     private String findEmail(String text){
+        //find a pattern with @ or [at] in the middle and dot at the end
         Pattern pattern = Pattern.compile("[\n\r\s]\\S+\s{0,1}(@|\\[at\\])\s{0,1}\\S+\\.\\S{1,6}");
         Matcher matcher = pattern.matcher(text);
         if(matcher.find()){
@@ -242,6 +230,34 @@ public class InfobjectExtractor{
         }
     }
 
+    //functions for formalisation of output into infobject.txt
+
+    //draw a bar, that has a length, no less than of the longest textual representation of an infobjects field (most likely, URL)
+    private void draw_vertical_bar(FileWriter writer){
+        Integer i = 0;
+        try{
+            while(i < this.biggest_length + 5){
+                writer.write("-");
+                i++;
+            }        
+        }catch(IOException e){
+        }
+    }
+
+    //change a string, so that vertical bars of each "capsule" in infobject.txt files is properly closed at the right side
+    private String draw_right_bar(String string){
+        Integer difference = this.biggest_length - string.length() + 5;
+        if(difference > 0){
+            for(Integer i = 0; i <= difference; i++){
+                string = string + " ";
+            }
+        }
+        string = string + "|\n";
+        return string;
+    }
+
+
+    //root function of the class
     public void extract(Document doc){
         this.doc = doc;        
         for(String item : this.infobjects){
@@ -286,21 +302,25 @@ public class InfobjectExtractor{
                     try {
                         FileWriter writer = new FileWriter("output/" + this.time + "-infobject.txt", true);
                         //separator
-                        writer.write("/------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                        writer.write("/");
+                        draw_vertical_bar(writer);
+                        writer.write("\\ \n");
                         //header
-                        writer.write(title + "\n");
+                        writer.write(draw_right_bar(title));
                         //url
-                        writer.write(url + "\n");
+                        writer.write(draw_right_bar(url));
                         //physical address
-                        writer.write(address + "\n");
+                        writer.write(draw_right_bar(address));
                         //open times
-                        writer.write(open_times + "\n");
+                        writer.write(draw_right_bar(open_times));
                         //email
-                        writer.write(email + "\n");
+                        writer.write(draw_right_bar(email));
                         //phone number
-                        writer.write(telephone + "\n");
+                        writer.write(draw_right_bar(telephone));
                         //bottom separator
-                        writer.write("\\-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n");;
+                        writer.write("\\");
+                        draw_vertical_bar(writer);
+                        writer.write("/ \n\n\n");
                         writer.close();
                     } catch (IOException e) {
                     }
