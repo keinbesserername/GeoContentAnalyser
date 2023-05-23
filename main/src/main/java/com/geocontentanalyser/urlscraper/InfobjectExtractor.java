@@ -21,6 +21,9 @@ public class InfobjectExtractor{
     //name of current landkreis
     String current_landkreis;
 
+    //all possible kinds of infobjects
+    String[] infobjects = {"museum", "kirche", "schule_", "schule.", "amt_", "amt.", "gymnasium.", "gimnasium_", "dezernat", "wesen", "bau.", "bau_", "zentrum", "einheit", "rat", "tag", "halle"};
+
     //keeping track of what's been found, not to allow dublicates
     ArrayList<String> found_addresses= new ArrayList<String>();
     ArrayList<String> found_emails = new ArrayList<String>();
@@ -240,9 +243,8 @@ public class InfobjectExtractor{
     }
 
     public void extract(Document doc){
-        this.doc = doc;
-        String[] infobjects = {"museum", "kirche", "schule_", "amt_"};
-        for(String item : infobjects){
+        this.doc = doc;        
+        for(String item : this.infobjects){
             if(this.doc.location().contains(item)){
                 //return parameters to default
                 this.configure();                

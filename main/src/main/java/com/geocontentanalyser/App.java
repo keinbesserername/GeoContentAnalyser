@@ -12,7 +12,7 @@ import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
  */
 public class App {
     public static void main(String[] args) throws IOException {
-       List<String> wikiURLlList = WikiScrapperMain.crawler();
+        List<String> wikiURLlList = WikiScrapperMain.crawler();
 
         //change the URL to the one you want to scrape, manually
         //depth must be 0
