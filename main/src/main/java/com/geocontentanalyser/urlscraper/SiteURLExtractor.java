@@ -39,7 +39,8 @@ public class SiteURLExtractor implements Runnable {
         try {
             Response response = connection.method(Method.GET).execute();
             // retry 3 times if status code is not 200
-            while (response.statusCode() != 200 && retry < 3) {
+            while ((response.statusCode() != 200 && retry < 3)
+                    || (response.statusCode() > 400 && response.statusCode() < 500)) {
                 System.out.println("Retry " + retry + " " + URL);
                 response = connection.method(Method.GET).execute();
                 retry++;
@@ -99,7 +100,7 @@ public class SiteURLExtractor implements Runnable {
             }
         }
         // conversion to arraylist
-        //ArrayList<String> list = new ArrayList<String>(set);
+        // ArrayList<String> list = new ArrayList<String>(set);
         return set;
     }
 
