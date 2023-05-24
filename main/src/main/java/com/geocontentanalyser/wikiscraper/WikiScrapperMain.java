@@ -16,8 +16,8 @@ public class WikiScrapperMain {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("output/" + fileName + ".log", true));
 
-            writer.write("|" + name + "|" + url + "|");
-            writer.newLine();
+            //writer.write("|" + name + "|" + url + "|");
+            writer.write(url + "\n");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

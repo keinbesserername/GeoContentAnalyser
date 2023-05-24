@@ -2,13 +2,15 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
+import org.jsoup.Connection;
+import org.jsoup.Connection.Method;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class SiteURLExtractor implements Runnable {
@@ -18,31 +20,45 @@ public class SiteURLExtractor implements Runnable {
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
-        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
+        // remove http:// or https:// from the baseURL
+        this.fileName = baseURL.replace("www.", "").replace("https://", "")
+                .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
         recursiveDepth = 0;
 
-        // parse content into HTML
-        Document doc = Jsoup.connect(URL).get();
+        Document doc = new Document("");
+
+        Connection connection = Jsoup.connect(URL).followRedirects(true)
+                .userAgent(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
+
+        // this is very slow. The bottleneck lays here
+        int retry = 0;
+        try {
+            Response response = connection.method(Method.GET).execute();
+            // retry 3 times if status code is not 200
+            while (response.statusCode() != 200 && retry < 3) {
+                System.out.println("Retry " + retry + " " + URL);
+                response = connection.method(Method.GET).execute();
+                retry++;
+            }
+            // parse content into HTML document
+            doc = response.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // doc = connection.get();
         // get all links
         Elements links = doc.select("a[href]");
         // deduplicate links
-        ArrayList<String> localresultURLs = deduplicate(links);
+        Set<String> localresultURLs = deduplicate(links);
         // add links to resultURLs
         resultURLs.addAll(localresultURLs);
-
         // write links to file
-        try {
-            FileWriter writer = new FileWriter("output/site/" + fileName + ".txt", true);
-            for (String link : localresultURLs) {
-                writer.write(link + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-        }
-
+        writeToFile(true, localresultURLs);
         // filter the document
         filter(doc);
 
@@ -50,9 +66,11 @@ public class SiteURLExtractor implements Runnable {
         if (recursiveDepth <= 4) {
             // call recursive function to extract links from each link
             for (String link : localresultURLs) {
-                // delay 1 second
+                // delay 0.1 second
                 try {
-                    Thread.sleep(250);
+                    // due to how slow the program run, the delay is much greater than 0.1 second
+                    // anyway. This is here to prevent runaways. 10 requests per second is very slow
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -62,27 +80,27 @@ public class SiteURLExtractor implements Runnable {
 
     }
 
-    public ArrayList<String> deduplicate(Elements links) {
-        Iterator<Element> it = links.iterator();
-        while (it.hasNext()) {
-            Element link = it.next();
-            // check if contain javascript, #, mailto, or not html, not baseURL, or already
-            // exist in resultURLs
-            if (link.attr("href").contains("javascript") || link.attr("href").contains("#")
-                    || link.attr("href").contains("mailto") || !link.attr("href").contains("html")
-                    || !link.attr("abs:href").contains(baseURL) || resultURLs.contains(link.attr("abs:href"))) {
-                it.remove();
+    public LinkedHashSet<String> deduplicate(Elements links) {
+        // Regex to filter html
+        String htmlPattern = ".*\\.(html|htm|php|asp|aspx)$";
+        // Regex to filter links without extension
+        String noExtPattern = ".*/([^.]+)$";
+        // LinkedHashSet to deduplicate links
+        LinkedHashSet<String> set = new LinkedHashSet<String>();
+
+        for (Element link : links) {
+            String linkString = trackerStripper(link.attr("abs:href"));
+            String strippedLink = trackerStripper(linkString);
+
+            if (strippedLink.contains(baseURL) && !resultURLs.contains(linkString)
+                    && (strippedLink.matches(htmlPattern) || strippedLink.matches(noExtPattern))) {
+                // duplicate links are not added
+                set.add(linkString);
             }
         }
-
-        // conversion to set to remove duplicates
-        Set<String> set = new LinkedHashSet<String>();
-        for (Element link : links) {
-            set.add(link.attr("abs:href"));
-        }
         // conversion to arraylist
-        ArrayList<String> list = new ArrayList<String>(set);
-        return list;
+        //ArrayList<String> list = new ArrayList<String>(set);
+        return set;
     }
 
     public void setBaseURL(String baseURL) {
@@ -92,17 +110,36 @@ public class SiteURLExtractor implements Runnable {
     @Override
     public void run() {
         // remove the previous output file
+        writeToFile(false, null);
         try {
-            FileWriter writer = new FileWriter("output/site/" + fileName + ".txt", false);
+            extractURL(baseURL, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToFile(boolean append, Set<String> localresultURLs) {
+        // write links to file
+        try {
+            FileWriter writer = new FileWriter("output/site/" + fileName + ".txt", append);
+            if (localresultURLs != null) {
+                for (String link : localresultURLs) {
+                    writer.write(link + "\n");
+                }
+            }
             writer.close();
         } catch (IOException e) {
         }
+    }
 
-        try {
-            extractURL(baseURL, 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public String trackerStripper(String link) {
+        // strip everything after the # in the link
+        String[] linkParts = link.split("#");
+        String output = linkParts[0];
+        // strip everything after the ? in the link
+        linkParts = output.split("\\?");
+        output = linkParts[0];
+        return output;
     }
 
     public void filter(Document doc) {
@@ -110,7 +147,6 @@ public class SiteURLExtractor implements Runnable {
         // This function presents a HTML file formatted as a JSoup document
         // You can use the JSoup API to filter the document
         // Just call it here
-
     }
 
 }
