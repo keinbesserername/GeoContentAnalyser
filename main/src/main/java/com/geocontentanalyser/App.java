@@ -30,7 +30,7 @@ public class App {
             thread.start();
         }
         */
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor("https://www.mainz-bingen.de/");
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor("https://www.kreis-mettmann.de/");
         Thread thread = new Thread(siteURLExtractor);
         thread.start();
     }
