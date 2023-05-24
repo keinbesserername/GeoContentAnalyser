@@ -109,7 +109,7 @@ public class SiteURLExtractor implements Runnable {
     }
 
     public void filter(Document doc) {       
-        this.infobjectExtractor.extract(doc);
+        this.infobjectExtractor.start(doc);
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;;
 
-public class InfobjectExtractor{
+public class InfobjectExtractor extends Thread{
     Document doc;
     //infobject files' names are unique
     String time;
@@ -29,7 +29,8 @@ public class InfobjectExtractor{
     Boolean simplify;
 
     //all possible kinds of infobjects
-    String[] infobjects = {"museum", "kirche", "schule_", "schule.", "amt_", "amt.", "gymnasium.", "gimnasium_", "dezernat", "wesen", "bau.", "bau_", "zentrum", "einheit", "rat", "tag", "halle"};
+    String[] infobjects = {"museum", "kirche", "schule_", "schule.", "amt_", "amt.", "gymnasium.", "gimnasium_", "dezernat", "wesen", "bau.", "bau_",
+                           "zentrum", "einheit", "rat", "tag", "halle", "sg", "sachverständigengesellschaft"};
 
     //keeping track of what's been found, not to allow dublicates
     ArrayList<String> found_urls = new ArrayList<String>();
@@ -283,7 +284,7 @@ public class InfobjectExtractor{
 
 
     //root function of the class
-    public void extract(Document doc){
+    public void start(Document doc){
         this.doc = doc;        
         for(String item : this.infobjects){
             if(this.doc.location().contains(item) && !this.found_urls.contains(doc.location())){
@@ -315,7 +316,7 @@ public class InfobjectExtractor{
                     //incrementing the infobject counter
                     infobject_counter++;
                     try{
-                        RandomAccessFile file = new RandomAccessFile(this.directory + "/" + this.current_landkreis + ".txt", "rw");
+                        RandomAccessFile file = new RandomAccessFile(this.filename, "rw");
                         byte[] bytes = (this.current_landkreis + "\nInfobjects Found: " + infobject_counter + "\n\n\n").getBytes();
                         file.write(bytes, 0, bytes.length);
                         file.close();
