@@ -1,5 +1,6 @@
 package com.geocontentanalyser.urlscraper;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -18,8 +19,12 @@ public class InfobjectExtractor{
     String time;
     //keeps track of number of found infobjects
     Integer infobject_counter = 0;
-    //name of current landkreis
+    //url of current landkreis
     String current_landkreis;
+    //name of the directory, where found data is stored
+    String directory;
+    //current file, to which infobjects are stored (unique for each landkreis)
+    String filename;
     //"simplify" flag is used not to place the output in "capsules" anymore, it is useful for parcing of infobject.txt files (yet to be implemented)
     Boolean simplify;
 
@@ -40,8 +45,18 @@ public class InfobjectExtractor{
     //list of found containers, not to search for them multiple times
     Elements containers, text_tags;
 
-    InfobjectExtractor(Boolean simplify){
+    InfobjectExtractor(String baseURL, Boolean simplify){
+        //create a folder for the duration of the whole search
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
+        this.directory = "output/" + this.time + "-infobjects";
+        File dir = new File(this.directory);
+        dir.mkdirs();
+
+        //root url is used to separate infobjects by files, depending on their landkreis attachment
+        this.current_landkreis = baseURL.toString();
+        this.filename = this.directory + "/" + this.current_landkreis.replaceAll("http(s)?://", "") + ".txt";        
+        
+        //if true, will not put infobjects into "capsules"
         this.simplify = simplify;
     }        
 
@@ -300,8 +315,8 @@ public class InfobjectExtractor{
                     //incrementing the infobject counter
                     infobject_counter++;
                     try{
-                        RandomAccessFile file = new RandomAccessFile("output/" + this.time + "-infobject.txt", "rw");
-                        byte[] bytes = ("\nInfobjects Found: " + infobject_counter + "\n\n\n").getBytes();
+                        RandomAccessFile file = new RandomAccessFile(this.directory + "/" + this.current_landkreis + ".txt", "rw");
+                        byte[] bytes = (this.current_landkreis + "\nInfobjects Found: " + infobject_counter + "\n\n\n").getBytes();
                         file.write(bytes, 0, bytes.length);
                         file.close();
                     }
@@ -310,7 +325,7 @@ public class InfobjectExtractor{
 
                     //writing the found in the file
                     try {
-                        FileWriter writer = new FileWriter("output/" + this.time + "-infobject.txt", true);
+                        FileWriter writer = new FileWriter(this.filename, true);
                         //separator
                         writer.write("/");
                         draw_vertical_bar(writer);
