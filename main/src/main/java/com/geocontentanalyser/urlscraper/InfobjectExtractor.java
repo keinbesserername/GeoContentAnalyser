@@ -17,7 +17,9 @@ public class InfobjectExtractor extends Thread{
     Document doc;
     //infobject files' names are unique
     String time;
-    //keeps track of number of found infobjects
+    //keeps track of number of found infobjects in general
+    Integer infobject_counter_global = 0;
+    //keeps track of number of found infobjects on a given site
     Integer infobject_counter = 0;
     //url of current landkreis
     String current_landkreis;
@@ -59,8 +61,17 @@ public class InfobjectExtractor extends Thread{
         
         //if true, will not put infobjects into "capsules"
         this.simplify = simplify;
-    }        
+    } 
+    
+    //used from SiteURLExtractor each time a landkreis site is changed
+    public void reconfigure(String baseURL){
+        this.infobject_counter_global += infobject_counter;
+        this.infobject_counter = 0;
+        this.current_landkreis = baseURL;
+        this.filename = this.directory + "/" + this.current_landkreis.replaceAll("http(s)?://", "") + ".txt";  
+    }
 
+    //used from start() to set up the baseline parameter values for an infobject
     private void configure(){
         this.title =      "|Title       |  -----> ";                
         this.url =        "|URL         | " +  this.doc.location();
@@ -283,7 +294,7 @@ public class InfobjectExtractor extends Thread{
     }
 
 
-    //root function of the class
+    //root function of the class, formerly known as extract()
     public void start(Document doc){
         this.doc = doc;        
         for(String item : this.infobjects){
