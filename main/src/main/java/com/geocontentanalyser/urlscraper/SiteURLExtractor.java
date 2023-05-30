@@ -47,7 +47,7 @@ public class SiteURLExtractor implements Runnable {
         }
 
         // filter the document
-        filter(doc);
+        this.filter(doc);
 
         // if recursive depth is less than 4, call recursive function
         if (recursiveDepth <= 4) {
@@ -109,7 +109,7 @@ public class SiteURLExtractor implements Runnable {
     }
 
     public void filter(Document doc) {       
-        this.infobjectExtractor.start(doc);
+        this.infobjectExtractor.extract(doc);
     }
 
 }
