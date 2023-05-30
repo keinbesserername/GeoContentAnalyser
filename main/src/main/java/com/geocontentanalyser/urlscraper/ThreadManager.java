@@ -3,6 +3,7 @@ package com.geocontentanalyser.urlscraper;
 import java.io.FileWriter;
 import java.util.LinkedHashSet;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadManager implements Runnable {
@@ -11,6 +12,7 @@ public class ThreadManager implements Runnable {
     String baseURL;
     String fileName;
     Data data;
+    Semaphore writeProtection = new Semaphore(1);
 
     public ThreadManager(String baseURL) {
         this.baseURL = baseURL;
@@ -28,9 +30,12 @@ public class ThreadManager implements Runnable {
         SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
+                // semaphore to prevent dirty read/write
+                writeProtection.acquireUninterruptibly();
                 // merge the data
                 // output the difference to a new Set
                 LinkedHashSet<String> difference = data.mergeData(newdata);
+                writeProtection.release();
                 // write the difference to file
                 writeToFile(true, difference);
             }
@@ -52,3 +57,4 @@ public class ThreadManager implements Runnable {
         }
     }
 }
+//TODO: 1. Implement a queue to store the URLs to be processed
