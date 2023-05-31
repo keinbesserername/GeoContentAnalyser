@@ -12,16 +12,16 @@ import org.jsoup.select.Elements;
 
 public class SiteURLExtractor implements Runnable {
 
-    LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
-    
+    String URL;
     Data data = new Data(baseURL);
 
     private Callback callback;
 
-    public SiteURLExtractor(String baseURL,Callback callback) {
+    public SiteURLExtractor(String baseURL, String URL, Callback callback) {
         this.baseURL = baseURL;
         this.callback = callback;
+        this.URL = URL;
     }
 
     public Data extractURL(String URL) throws IOException {
@@ -53,14 +53,10 @@ public class SiteURLExtractor implements Runnable {
         // doc = connection.get();
         // get all links
         Elements links = doc.select("a[href]");
-        // deduplicate links
-        LinkedHashSet<String> localresultURLs = deduplicate(links);
-        // add links to resultURLs
-        resultURLs.addAll(localresultURLs);
         // filter the document
         filter(doc);
         // output to Data
-        data.setSet(resultURLs);
+        data.setSet(deduplicate(links));
         // return data
         return data;
     }
@@ -77,10 +73,9 @@ public class SiteURLExtractor implements Runnable {
             String linkString = trackerStripper(link.attr("abs:href"));
             String strippedLink = trackerStripper(linkString);
 
-            if (strippedLink.contains(baseURL) && !resultURLs.contains(linkString)
-                    && (!strippedLink.contains("javascript"))
+            if (strippedLink.contains(baseURL) && (!strippedLink.contains("javascript")) && isLink(strippedLink)
                     && (strippedLink.matches(htmlPattern) || strippedLink.matches(noExtPattern))) {
-                // duplicate links are not added
+
                 set.add(linkString);
             }
         }
@@ -94,13 +89,12 @@ public class SiteURLExtractor implements Runnable {
     @Override
     public void run() {
         try {
-            extractURL(baseURL);
+            extractURL(URL);
             callback.onDataExtracted(data);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     public String trackerStripper(String link) {
         // strip everything after the # in the link
@@ -117,6 +111,17 @@ public class SiteURLExtractor implements Runnable {
         // This function presents a HTML file formatted as a JSoup document
         // You can use the JSoup API to filter the document
         // Just call it here
+    }
+
+    public Boolean isLink(String inputString) {
+        /* Try creating a valid URL */
+        try {
+            new java.net.URL(inputString).toURI();
+            return true;
+        }
+        catch (Exception e) {
+            return false;
+        }
     }
 
 }

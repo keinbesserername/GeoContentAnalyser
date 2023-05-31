@@ -85,10 +85,10 @@ public class Data {
         this.count_Coordinates += newdata.getCount_Coordinates();
         this.count_EmbeddedMaps += newdata.getCount_EmbeddedMaps();
         this.count_ExternalMaps += newdata.getCount_ExternalMaps();
-        this.set.addAll(newdata.getSet());
         //make a copy of the new set and remove all elements of existing set from the copy
         LinkedHashSet<String> difference = new LinkedHashSet<String>(newdata.getSet());
         difference.removeAll(this.set);
+        this.set.addAll(newdata.set);
         return difference;
     }
 }
