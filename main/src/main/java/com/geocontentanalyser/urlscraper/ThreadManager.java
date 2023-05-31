@@ -46,9 +46,9 @@ public class ThreadManager implements Runnable {
                 // take thread count semaphore
                 threadLimitSemaphore.acquireUninterruptibly();
                 executor.execute(extractorCall(baseURL,URL));
-                // limit to maximum of 10 requests per second. Realistically,
+                // limit to maximum of 8 requests per second. Realistically,
                 // it is unlikely that thread would finish its execution within 100ms
-                Thread.sleep(100);
+                Thread.sleep(125);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
