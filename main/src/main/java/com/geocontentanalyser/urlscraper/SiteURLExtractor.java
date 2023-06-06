@@ -1,11 +1,14 @@
 package com.geocontentanalyser.urlscraper;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedHashSet;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -24,7 +27,7 @@ public class SiteURLExtractor implements Runnable {
         this.URL = URL;
     }
 
-    public Data extractURL(String URL) throws IOException {
+    public Data extractURL(String URL) throws IOException, InterruptedException {
 
         Document doc = new Document("");
 
@@ -33,19 +36,22 @@ public class SiteURLExtractor implements Runnable {
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
 
         // this is very slow. The bottleneck lays here
-        int retry = 0;
+
         try {
             Response response = connection.method(Method.GET).execute();
-            // retry 3 times if status code is not 200
-            while ((response.statusCode() != 200 && retry < 3)
-                    || (response.statusCode() > 400 && response.statusCode() < 500)) {
-                System.out.println("Retry " + retry + " " + URL);
-                Thread.sleep(100);
-                response = connection.method(Method.GET).execute();
-                retry++;
-            }
-            // parse content into HTML document
             doc = response.parse();
+        } catch (UnsupportedMimeTypeException m) {
+            // if the mime type is not supported, return empty data
+            System.out.println("Unsupported mime type");
+            return data;
+        } catch (SocketTimeoutException e) {
+            // if the socket times out, retry
+            System.out.println("Socket timed out");
+            retry(connection);
+        } catch (HttpStatusException e) {
+            // if the socket times out, retry
+            System.out.println("HTTP Status Exception");
+            retry(connection);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,10 +124,30 @@ public class SiteURLExtractor implements Runnable {
         try {
             new java.net.URL(inputString).toURI();
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    public Document retry(Connection connection) {
+        int retry = 0;
+        Document doc = new Document("");
+        // retry 3 times if socket times out
+        while (retry < 3) {
+            System.out.println("Retry " + retry + " " + URL);
+            try {
+                // exponential backoff
+                Thread.sleep((long) (100 * Math.pow(3, retry+1)));
+                Response response = connection.method(Method.GET).execute();
+                doc = response.parse();
+                System.out.println("success " + URL);
+                break;
+            } catch (Exception e) {
+                retry++;
+                System.out.println("failed");
+            }
+        }
+        return doc;
     }
 
 }

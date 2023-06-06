@@ -9,22 +9,26 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadManager implements Runnable {
-    // Pool of threads with a maximum of 5 threads
-    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+    // Pool of threads with a maximum of 4 threads
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
+
     String baseURL;
     String fileName;
     Data data;
+    // semaphore to prevent dirty read/write, and limit the number of threads
     Semaphore writeProtection = new Semaphore(1);
-    Semaphore threadLimitSemaphore = new Semaphore(5, true);
+    Semaphore threadLimitSemaphore = new Semaphore(4, true);
     // FIFO thread safe queue
     BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
+    Callback callback;
 
-    public ThreadManager(String baseURL) {
+    public ThreadManager(String baseURL, Callback callback) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
         this.fileName = baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
+        this.callback = callback;
 
     }
 
@@ -34,9 +38,11 @@ public class ThreadManager implements Runnable {
         writeToFile(false, null);
         // start the thread
         // prime the system with initial data
-        // it doesnt matter if the boolean is true or false
-        // it is just to differentiate between the two overloaded methods
+        // extractor got 1 argument for the first execution
+        // 2 arguments for the next executions
         extractorCall(baseURL).run();
+
+        long previousTime = System.currentTimeMillis();
 
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
@@ -45,16 +51,25 @@ public class ThreadManager implements Runnable {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore
                 threadLimitSemaphore.acquireUninterruptibly();
-                executor.execute(extractorCall(baseURL,URL));
-                // limit to maximum of 8 requests per second. Realistically,
-                // it is unlikely that thread would finish its execution within 100ms
-                Thread.sleep(125);
+                executor.execute(extractorCall(baseURL, URL));
+
+                long currentTime = System.currentTimeMillis();
+                long executionTime = currentTime - previousTime;
+                previousTime = currentTime;
+                System.out.println("Execution time: " + executionTime);
+
+                // limit to maximum of 2 requests per second.
+                // most of the time, the execution time is less than 500ms
+                // but to be safe, we will limit it to 2 requests per second
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         }
-        // executor.shutdown();
+        System.out.println("Finished");
+        executor.shutdown();
+        callback.onDataExtracted(data);
     }
 
     // write the links to file, take in a boolean to determine whether to append or
