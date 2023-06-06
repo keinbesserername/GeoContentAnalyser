@@ -1,0 +1,35 @@
+= Protokoll Gruppe 2
+
+Treffen am 06.06.2023
+
+Ort:      HS Merseburg +
+Beginn:   15:16 Uhr +
+Ende:     15:22 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+13.06.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Duc Hieu Le
+- Leon Kunze
+- Astrid Rindfleisch
+- Robert Peter
+
+== Bemerkungen
+- Andrii konnte nicht teilnehmen
+- Termine (nach dem Projektplan, kann abweichen)
+    - Tag der Präsentation: 30.07.23
+    - Ende des Projektes "GeoContentAnalyser": 20.07.23
+    - von 20.07 bis 30.07 Arbei an der Präsentation
+- es wird nochmal mit Prof. Weinkauf geredet, ob dies so richtig ist
+
+== Retrospektive des letzten Sprints
+
+== Aktueller Stand
+- Leon führt weiterhin die Literatur Search durch
+- Le ist fertig mit seinem Teil und wartet auf die anderen in der Entwicklergruppe
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung werden weiterhin, wie am 25.04.2023 besprochen, bearbeitet
