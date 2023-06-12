@@ -1,5 +1,6 @@
 package com.geocontentanalyser.urlscraper;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.LinkedHashSet;
 import java.util.concurrent.BlockingQueue;
@@ -9,8 +10,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadManager implements Runnable {
-    // Pool of threads with a maximum of 4 threads
-    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
+    // Pool of threads with a maximum of 2 threads
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
     String baseURL;
     String fileName;
@@ -22,27 +23,24 @@ public class ThreadManager implements Runnable {
     BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
     Callback callback;
 
-    public ThreadManager(String baseURL, Callback callback) {
+    public ThreadManager(String baseURL, String sessionPath, Callback callback) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
-        this.fileName = baseURL.replace("www.", "").replace("https://", "")
+        this.fileName = sessionPath + File.pathSeparator + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
-
     }
 
     @Override
     public void run() {
-        // remove the previous output file
-        writeToFile(false, null);
         // start the thread
         // prime the system with initial data
         // extractor got 1 argument for the first execution
         // 2 arguments for the next executions
         extractorCall(baseURL).run();
 
-        long previousTime = System.currentTimeMillis();
+        // long previousTime = System.currentTimeMillis();
 
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
@@ -53,10 +51,13 @@ public class ThreadManager implements Runnable {
                 threadLimitSemaphore.acquireUninterruptibly();
                 executor.execute(extractorCall(baseURL, URL));
 
-                long currentTime = System.currentTimeMillis();
-                long executionTime = currentTime - previousTime;
-                previousTime = currentTime;
-                System.out.println("Execution time: " + executionTime);
+                // print the execution time
+                /*
+                 * long currentTime = System.currentTimeMillis();
+                 * long executionTime = currentTime - previousTime;
+                 * previousTime = currentTime;
+                 * System.out.println("Execution time: " + executionTime);
+                 */
 
                 // limit to maximum of 2 requests per second.
                 // most of the time, the execution time is less than 500ms
@@ -67,17 +68,17 @@ public class ThreadManager implements Runnable {
             }
 
         }
-        System.out.println("Finished");
+        System.out.println("Finished + " + baseURL);
         executor.shutdown();
         callback.onDataExtracted(data);
     }
 
     // write the links to file, take in a boolean to determine whether to append or
     // not, and a set of links to write
-    public void writeToFile(boolean append, LinkedHashSet<String> URLs) {
+    public void writeToFile(LinkedHashSet<String> URLs) {
         // write links to file
         try {
-            FileWriter writer = new FileWriter("output/site/" + fileName + ".txt", append);
+            FileWriter writer = new FileWriter(fileName + ".log");
             if (URLs != null) {
                 for (String link : URLs) {
                     writer.write(link + "\n");
@@ -95,7 +96,7 @@ public class ThreadManager implements Runnable {
             public void onDataExtracted(Data newdata) {
                 data.mergeData(newdata);
                 addToQueue(data.set);
-                writeToFile(true, data.set);
+                writeToFile(data.set);
             }
         });
         return siteURLExtractor;
@@ -116,7 +117,7 @@ public class ThreadManager implements Runnable {
                 // adding the difference to the set
                 addToQueue(difference);
                 // write the difference to file
-                writeToFile(true, difference);
+                writeToFile(difference);
                 writeProtection.release();
                 // release thread count semaphore
                 threadLimitSemaphore.release();

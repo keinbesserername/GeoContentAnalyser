@@ -1,10 +1,9 @@
-package com.geocontentanalyser.urlscraper;
+package com.geocontentanalyser.infobject;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -373,11 +372,6 @@ public class InfobjectExtractrorThread extends Thread {
         }  
     }
 
-    // in case, a destructor is need in the future instances of the project
-    @Override
-    protected void finalize() throws Throwable {
-        // TODO Auto-generated method stub
-        super.finalize();
-    }
+    
     
 }

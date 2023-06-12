@@ -1,4 +1,4 @@
-package com.geocontentanalyser.urlscraper;
+package com.geocontentanalyser.infobject;
 
 import java.io.File;
 
