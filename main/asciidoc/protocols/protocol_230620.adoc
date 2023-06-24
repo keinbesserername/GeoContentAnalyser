@@ -1,0 +1,30 @@
+= Protokoll Gruppe 2
+
+Treffen am 20.06.2023
+
+Ort:      HS Merseburg +
+Beginn:   15:20 Uhr +
+Ende:     15:27 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+30.06.2023, 15:15 Uhr, Discord
+
+__Teilnehmer:__
+- Duc Hieu Le
+- Leon Kunze
+- Astrid Rindfleisch
+- Andrii Roshkovan
+
+== Bemerkungen
+- das Meeting letzte Woche viel aufgrund von anderweitigen Terminen aus
+- Präsentationstermin wurde auf den 06.07.23, 10 Uhr, von Prof. Weinkauf festgelegt
+
+== Retrospektive des letzten Sprints
+
+== Aktueller Stand
+- keinen wichtigen Fortschritt zu dokumentieren
+
+== Planung des nächsten Sprints
+- Aufgaben für die weitere Entwicklung werden weiterhin, wie am 25.04.2023 besprochen, bearbeitet
