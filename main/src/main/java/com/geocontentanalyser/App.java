@@ -58,7 +58,9 @@ public class App {
         Semaphore threadCreation = new Semaphore(15, true);
 
         // Acquire the list of URLs from Wikipedia
-        //List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+
+        /*
         // read each line from t.log and save to a list
         // make it quicker for testing
         List<String> wikiURLlList = new ArrayList<String>();
@@ -74,7 +76,7 @@ public class App {
         } catch (Exception e) {
             System.out.println(e);
         }
-
+        */
         // Start the threads
         for (String URL : wikiURLlList) {
             threadCreation.acquireUninterruptibly();
