@@ -59,11 +59,6 @@ public class App {
 
         // Acquire the list of URLs from Wikipedia
         List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
-<<<<<<< Updated upstream
-
-        /*
-=======
->>>>>>> Stashed changes
         // read each line from t.log and save to a list
         // make it quicker for testing
         /* 
