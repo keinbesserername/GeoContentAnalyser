@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,7 +125,9 @@ public class InfobjectExtractrorThread extends Thread {
                         if (matcher.find()){
                             // check, if this address was encountered prior
                             if(!this.infobjectExtractor.found_addresses.contains(matcher.group(0))){
-                                return matcher.group(0);
+                                // remove unnecessary information
+                                street = street.replace("(?i)(Anschrift|Adr(esse)?|Addr(ess)?)(?-i)", "");
+                                return street;  
                             }else{
                                 streets.add(matcher.group(0));
                             }                
@@ -145,11 +146,12 @@ public class InfobjectExtractrorThread extends Thread {
                     // remove newline characters and redundant whitespaces
                     street = elements.first().text().replace("\n| {2,}", ", ");
                     // remove unnecessary information
-                    street = street.replace("Anschrift|Adresse|Address", "");
+
+                    street = street.replace("(?i)(Anschrift|Adr(esse)?|Addr(ess)?)(?-i)", "");
                     return street;  
                 // in case, all found streets are not unique   
                 }else{
-                    street = streets.get(0) + " (not unique)";
+                    street = streets.get(0).replace("(?i)(Anschrift|Adr(esse)?|Addr(ess)?)(?-i)", "") + " (not unique)";
                     return street;
                 }
                                               
@@ -189,23 +191,23 @@ public class InfobjectExtractrorThread extends Thread {
     private String findOpenTimes(){
         for(Element element : this.text_tags){
             // searching through all containers on page
-            Pattern pattern = Pattern.compile("(Ö|ö)ffnungszeiten");
+            Pattern pattern = Pattern.compile("[(Ö|ö)ffnungszeiten|Sprechzeiten]");
             Matcher matcher = pattern.matcher(element.text());
             if(matcher.find()){
                 // if found, see if the whole open time is in container
-                pattern = Pattern.compile("Öffnungszeiten(\s|\n)*((Mo|Di|Mi|Do|Fr|Sa|So).{10,45}Uhr(\n|\s))+", Pattern.CASE_INSENSITIVE);
+                pattern = Pattern.compile("[(\u00D6|\u00F6)ffnungszeiten|Sprechzeiten](\s|\n)*((Mo|Di|Mi|Do|Fr|Sa|So).{10,45}Uhr(\n|\s))+", Pattern.CASE_INSENSITIVE);
                 matcher = pattern.matcher(element.text());
                 if(matcher.find()){
-                    return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
+                    return matcher.group(0).replace("[(\u00D6|\u00F6)ffnungszeiten|Sprechzeiten](\s|)", "");
                 }else{
                     // if not in the container itself, search through parent element
                     matcher = pattern.matcher(element.parent().text());
                     if(matcher.find()){
-                        return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
+                        return matcher.group(0).replace("[(Ö|ö)ffnungszeiten|Sprechzeiten](\s|)", "");
                     }else{
                         matcher = pattern.matcher(element.parent().parent().text());
                         if(matcher.find()){
-                            return matcher.group(0).replace("(Ö|ö)ffnungszeiten(\s|)", "");
+                            return matcher.group(0).replace("[(Ö|ö)ffnungszeiten|Sprechzeiten](\s|)", "");
                         }
                         /*
                         else{
@@ -328,7 +330,7 @@ public class InfobjectExtractrorThread extends Thread {
                         // found infobjects and maps
                         byte[] bytes = 
                         (this.current_landkreis + 
-                        "\nInfobjects Found: " + this.infobject_counter + 
+                        "\nInfobjects Found: " + this.infobjectExtractor.infobject_counter_global + 
                         "\nMaps found: " + this.infobjectExtractor.map_counter + "\n\n\n").getBytes();
 
                         file.write(bytes, 0, bytes.length);

@@ -2,14 +2,20 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.File;
 
-import java.time.Instant;
 import java.util.ArrayList;
 
 import java.util.concurrent.Semaphore;
 
 import org.jsoup.nodes.*;
 
+// extention of Thread is needed for usage of semaphores
+
 public class InfobjectExtractor extends Thread{
+
+    //
+    // initialise variables
+    //
+     
     private Document doc;
     // infobject files' names are unique
     private String time;
@@ -28,10 +34,12 @@ public class InfobjectExtractor extends Thread{
 
     // all possible kinds of infobjects
     // sg - Sachverständigengesellschaft, ag - Arbeitsgemeindschaft
+
     public String[] infobjects = {"museum", "kirche", "schule_", "schule.", "amt_", "amt.", "gymnasium.", "gimnasium_", "dezernat", "wesen", "bau.", "bau_",
                                   "zentrum", "einheit", "rat", "tag", "halle", "sg", "ag", "gemeindschaft", "gesellschaft", "organisation", };
 
     // keeping track of what's been found, not to allow dublicates
+
     public ArrayList<String> found_urls = new ArrayList<String>();
     public ArrayList<String> found_addresses = new ArrayList<String>();
     public ArrayList<String> found_emails = new ArrayList<String>();
@@ -42,10 +50,10 @@ public class InfobjectExtractor extends Thread{
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
     public Semaphore fileSemaphore = new Semaphore(1, isAlive());
 
-    InfobjectExtractor(String baseURL, Boolean simplify){
+    InfobjectExtractor(String baseURL, String time, Boolean simplify){
         // create a folder for the duration of the whole search
-        this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
-        this.directory = "output" + File.separator + this.time + "-infobjects";
+        this.time = time;
+        this.directory = "output" + File.separator + this.time + File.separator + "infobjects" + File.separator;
         File dir = new File(this.directory);
         dir.mkdirs();
 
@@ -57,17 +65,13 @@ public class InfobjectExtractor extends Thread{
     } 
     
     // used from SiteURLExtractor each time a landkreis site is changed
+
     public void reconfigure(String baseURL){
-        // this.infobject_counter_global += infobject_counter;
-        // this.infobject_counter = 0;
         this.current_landkreis = baseURL;
         this.filename = this.directory + File.separator + this.current_landkreis.replaceAll("http(s)?://", "") + ".txt";  
     }
 
-    
-
-
-    // root function of the class, formerly known as extract()
+    // root function of the class
 
     public void extract(Document doc){
         this.doc = doc;

@@ -2,6 +2,7 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.Iterator;
@@ -16,12 +17,16 @@ public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
     String baseURL;
     String fileName;
+    String time;
     InfobjectExtractor infobjectExtractor;
+    EServicesExtractor eServicesExtractor;
 
     public SiteURLExtractor(String baseURL) {
         this.baseURL = baseURL;
         this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
-        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, false);
+        this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
+        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.time, false);
+        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.time, false);
     }
 
     public void extractURL(String URL, int recursiveDepth) throws IOException {
@@ -110,6 +115,7 @@ public class SiteURLExtractor implements Runnable {
 
     public void filter(Document doc) {       
         this.infobjectExtractor.extract(doc);
+        this.eServicesExtractor.extract(doc);
     }
 
 }
