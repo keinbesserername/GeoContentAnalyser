@@ -1,0 +1,216 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class ExtractorThread extends Thread {
+    // the html document being parsed
+    private Document doc;
+    // main class is passed to an instance of this thread class in order to change the former's attributes, that are global for all infobjects
+    private Extractor extractor;
+    // where is being written (full path from the project's root)
+    private String filename;
+    //
+    private String current_landkreis;
+    // determines, if infobjects should be dumped into "capsules" in infobject.txt files (to be implemented)
+    private Boolean simplify;
+
+
+    // keeps track of number of found infobjects on a given site
+    private Integer infobject_counter = 0;
+    // parameters of an infobject                
+    private String title, url, state, size, inhabitants;
+    // biggest length from all of the parameters (for closing bars in infobject.txt; for more info check out draw_right_bar() funciton)
+    private Integer biggest_length;
+
+    // list of found containers, not to search for them multiple times
+    private Elements containers, text_tags;
+
+    ExtractorThread(Document doc, Extractor extractor, String filename, String current_landkreis, Boolean simplify){
+        this.doc = doc;
+        this.extractor = extractor;
+        this.filename = filename;
+        this.current_landkreis = current_landkreis;
+        this.simplify = simplify;
+    }
+
+    // used from start() to set up the baseline parameter values for an infobject
+    private void configure(){
+        this.title =      "| Title       |  -----> ";                
+        this.url =        "| URL         | " +  this.doc.location();
+        this.state =    "| Bundesland     | ";
+        this.size =      "| Größe       | ";
+        this.inhabitants =  "| Einwohnerzahl   | ";
+
+        this.biggest_length = this.url.length();
+
+        this.containers = this.doc.select("span,td,div");
+        this.text_tags = this.doc.select("p,span,text");
+
+        // add url to the list to avoid dublicates, that can occur if the recursive depth is set as high
+        this.extractor.found_urls.add(this.doc.location());
+    }    
+
+    
+    private String findState(String text){
+        Pattern pattern = Pattern.compile("(Bayern|Niedersachsen|Baden-Württemberg|Nordrhein-Westfalen|Brandenburg|Mecklenburg-Vorpommern|hessen|Sachsen-Anhalt|Rheinland-Pfalz|Sachsen|Thüringen|Schleswig-Holstein|Saarland|Hamburg|Berlin|Bremen)");
+        Matcher matcher = pattern.matcher(text);
+        String state= "";
+        if(matcher.find()){
+            // trying to find state
+            if(!this.extractor.found_state.contains(state)){
+                this.extractor.found_state.add(state);
+                return state.replace(" ", ""); 
+            }
+        }    
+        return "not found";
+    }
+
+    private String findSize(String text){
+        Pattern pattern = Pattern.compile("(Fläche|Größe|\z km^2|\z km|\zqkm");
+        Matcher matcher = pattern.matcher(text);
+        String size= "";
+        if(matcher.find()){
+            // trying to find size
+            state = matcher.group(0).replaceAll("(Fläche|Größe)", "");
+            if(!this.extractor.found_size.contains(state)){
+                this.extractor.found_size.add(state);
+                return size.replace(" ", ""); 
+            }
+        }    
+        return "not found";
+    }
+
+    private String findinhabitants(String text){
+        Pattern pattern = Pattern.compile("(Einwohner|EW|)(:|)");
+        Matcher matcher = pattern.matcher(text);
+        String inhabitants = "";
+        if(matcher.find()){
+            // trying to find size
+
+            state = matcher.group(0).replaceAll("(Einwohner|EW)(:|)", "");
+            if(!this.extractor.found_inhabitants.contains(state)){
+                this.extractor.found_inhabitants.add(state);
+                return size.replace(" ", ""); 
+            }
+        }    
+        return "not found";
+    }
+
+    // functions for formalisation of output into infobject.txt
+
+    // draw a bar, that has a length, no less than of the longest textual representation of an infobjects field (most likely, URL)
+    private void draw_vertical_bar(FileWriter writer){
+        Integer i = 0;
+        try{
+            while(i < this.biggest_length + 5){
+                writer.write("-");
+                i++;
+            }        
+        }catch(IOException e){
+        }
+    }
+
+    // change a string, so that vertical bars of each "capsule" in infobject.txt files is properly closed at the right side
+    private String draw_right_bar(String string){
+        Integer difference = this.biggest_length - string.length() + 5;
+        if(difference > 0){
+            for(Integer i = 0; i <= difference; i++){
+                string = string + " ";
+            }
+        }
+        string = string + "|\n";
+        return string;
+    }
+    
+    @Override
+    public void run(){
+         
+        for(String item : this.extractor.infobjects){                  
+            if(this.doc.location().contains(item) && !this..found_urls.contains(doc.location())){
+                // return parameters to default
+                this.configure();
+                
+                // it is an infobject, only if it has physical address, otherwise, it's a missmatch
+
+
+                    // find open state, if they haven't yet been found
+                    if(this.state == "| Bundesland      | "){
+                        this.state += this.findstate(doc.text());
+                    } 
+                    // searching for size, if it hadn't been yet found
+                    if(this.size == "| Größe       | "){
+                        this.size += this.findSize(doc.text());
+                    } 
+
+                    // searching for inhabitants, if it hadn't been yet found
+                    if(inhabitants == "| Einwohner   | "){
+                        this.inhabitants += this.findinhabitants(doc.text());
+                    } 
+                    
+                    // wait for semaphore's availability
+                    try{
+                        this.extractor.fileSemaphore.acquire();
+                    }
+                    catch(InterruptedException e){
+                    }
+
+                    // incrementing the infobject counter
+                    this.extractor.infobject_counter_global++;
+                    try{
+                        RandomAccessFile file = new RandomAccessFile(this.filename, "rw");
+
+                        // found infobjects and maps
+                        byte[] bytes = 
+                        (this.current_landkreis + 
+                        "\nInfobjects Found: " + this.infobject_counter + 
+                        "\nMaps found: " + this.extractor.map_counter + "\n\n\n").getBytes();
+
+                        file.write(bytes, 0, bytes.length);
+
+                        file.close();
+                    }
+                    catch(IOException e){
+                    }
+
+                    // writing the found in the file
+                    try {
+                        FileWriter writer = new FileWriter(this.filename, true);
+                        // separator
+                        writer.write("/");
+                        this.draw_vertical_bar(writer);
+                        writer.write("\\ \n");
+                        // header
+                        writer.write(this.draw_right_bar(this.title));
+                        // url
+                        writer.write(this.draw_right_bar(this.url));
+                        // state
+                        writer.write(this.draw_right_bar(this.state));
+                        // size
+                        writer.write(this.draw_right_bar(this.size));
+                        // inhabitants
+                        writer.write(this.draw_right_bar(this.inhabitants));
+                        // bottom separator
+                        writer.write("\\");
+                        this.draw_vertical_bar(writer);
+                        writer.write("/ \n\n\n");
+                        writer.close();
+                    } catch (IOException e) {
+                    }
+
+                    this.extractor.fileSemaphore.release();
+                }
+            }
+        }  
+    }
+
+    
+    
+}
