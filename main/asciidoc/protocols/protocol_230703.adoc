@@ -1,0 +1,36 @@
+= Protokoll Gruppe 2
+
+Treffen am 03.07.2023
+
+Ort:      HS Merseburg +
+Beginn:   12:50 Uhr +
+Ende:     12:55 Uhr
+
+__Schriftführer:__ Leon Kunze
+
+*Nächstes Treffen:* +
+05.07.2023, 13:30 Uhr, HS Merseburg
+
+__Teilnehmer:__
+- Duc Hieu Le
+- Leon Kunze
+- Astrid Rindfleisch
+- Robert Peter
+
+== Bemerkungen
+- Andrii, Robert und Le sollen bis spätestens dem Mittwoch dem 05.07.2023 mit ihrem Programmierteil
+  fertig werden, damit Astrid ihren Teil schreiben und mit der Auswertung beginnen kann.
+- die PPP wird in die Teile:
+    - Einführung
+    - Management (Leon)
+    - Code
+    - Auswertung (Astrid)
+  aufgeteilt
+- Einführung wird von Leon übernommen, wenn jeder bereits genug im Code-Teil zu sagen hat.
+
+== Retrospektive des letzten Sprints
+
+== Aktueller Stand,
+- jeder soll bis Mittwoch mit seinen Aufgaben fertig werden und seine Slides für die PPP
+  vorberteite haben (siehe presentation_geo_content_analyser.pptx)
+- jeder soll seine eigenen Slides bis Mittwoch vorbereiten
