@@ -18,7 +18,6 @@ public class SiteURLExtractor implements Runnable {
     String baseURL;
     String URL;
     Data data = new Data(baseURL);
-    int count = 0;
 
     private Callback callback;
 
@@ -113,29 +112,32 @@ public class SiteURLExtractor implements Runnable {
         return output;
     }
 
-    public int filter(Document doc) {
+    public void filter(Document doc) {
         // Insert whatever filter you want here
         // This function presents a HTML file formatted as a JSoup document
         // You can use the JSoup API to filter the document
         // Just call it here
-        //System.out.println(doc.toString());
-        //System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
+        // System.out.println(doc.toString());
+        // System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
 
+        interactiveMapCount(doc);
+    }
+
+    public void interactiveMapCount(Document doc) {
         String str = doc.toString();
         String findStr = "<map";
         int lastIndex = 0;
 
-        while(lastIndex != -1){
+        while (lastIndex != -1) {
 
-            lastIndex = str.indexOf(findStr,lastIndex);
+            lastIndex = str.indexOf(findStr, lastIndex);
 
-            if(lastIndex != -1){
-                count ++;
+            if (lastIndex != -1) {
+                data.count_EmbeddedMaps++;
                 lastIndex += findStr.length();
             }
         }
-        if(count>0) System.out.println("Found:" + count);
-        return count;
+
     }
 
     public Boolean isLink(String inputString) {
@@ -156,7 +158,7 @@ public class SiteURLExtractor implements Runnable {
             System.out.println("Retry " + retry + " " + URL);
             try {
                 // exponential backoff
-                Thread.sleep((long) (100 * Math.pow(3, retry+1)));
+                Thread.sleep((long) (100 * Math.pow(3, retry + 1)));
                 Response response = connection.method(Method.GET).execute();
                 doc = response.parse();
                 System.out.println("success " + URL);
@@ -168,9 +170,4 @@ public class SiteURLExtractor implements Runnable {
         }
         return doc;
     }
-    
-    public int getCount() {
-    	return count;
-    }
-
 }
