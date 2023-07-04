@@ -1,13 +1,12 @@
 package com.geocontentanalyser;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
@@ -52,11 +51,12 @@ public class App {
         File file = new File(sessionPath);
         file.mkdir();
 
+        
         // Allocate the thread pool
         // The number of threads is set to 15
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);
         Semaphore threadCreation = new Semaphore(15, true);
-
+		
         // Acquire the list of URLs from Wikipedia
         List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
         // read each line from t.log and save to a list
@@ -77,17 +77,39 @@ public class App {
         }
         */
         // Start the threads
+        ThreadManager[] threadManager = new ThreadManager[wikiURLlList.size()];
+        int i = 0;
         for (String URL : wikiURLlList) {
             threadCreation.acquireUninterruptibly();
-            ThreadManager threadManager = new ThreadManager(URL, sessionPath, new Callback() {
+            threadManager[i] = new ThreadManager(URL, sessionPath, new Callback() {
                 @Override
                 public void onDataExtracted(Data data) {
                     System.out.println("Data extracted" + data.getBaseURL());
                     threadCreation.release();
                 }
             });
-            executor.execute(threadManager);
+            executor.execute(threadManager[i]);
+            //System.out.println("Found in ThreadManager: " + threadManager[i].countData[0]);
+            int summe = 0;
+            for(int j=0; j<i; j++) {
+            	summe+=threadManager[j].countData[0];
+            }
+            if(summe>0) {
+            	System.out.println("Found " + summe + " interaktive Karten!");
+            	BufferedWriter writer = new BufferedWriter(
+                        new FileWriter(sessionPath + File.separator + "MapCount.txt", false));
+                writer.write("Number of Maps found: " + summe);
+                writer.close();
+            }
+            i++;
         }
+        /**
+        int summe = 0;
+        for(int j=0; j<threadManager.length; j++) {
+        	summe+=threadManager[j].countData[0];
+        }
+        System.out.println("Found " + summe + " interaktive Karten!");
+        **/
         executor.shutdown();
     }
 }

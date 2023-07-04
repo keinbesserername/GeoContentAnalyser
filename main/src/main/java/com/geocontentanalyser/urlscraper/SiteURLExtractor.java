@@ -18,6 +18,7 @@ public class SiteURLExtractor implements Runnable {
     String baseURL;
     String URL;
     Data data = new Data(baseURL);
+    int count = 0;
 
     private Callback callback;
 
@@ -112,11 +113,29 @@ public class SiteURLExtractor implements Runnable {
         return output;
     }
 
-    public void filter(Document doc) {
+    public int filter(Document doc) {
         // Insert whatever filter you want here
         // This function presents a HTML file formatted as a JSoup document
         // You can use the JSoup API to filter the document
         // Just call it here
+        //System.out.println(doc.toString());
+        //System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
+
+        String str = doc.toString();
+        String findStr = "<map";
+        int lastIndex = 0;
+
+        while(lastIndex != -1){
+
+            lastIndex = str.indexOf(findStr,lastIndex);
+
+            if(lastIndex != -1){
+                count ++;
+                lastIndex += findStr.length();
+            }
+        }
+        if(count>0) System.out.println("Found:" + count);
+        return count;
     }
 
     public Boolean isLink(String inputString) {
@@ -148,6 +167,10 @@ public class SiteURLExtractor implements Runnable {
             }
         }
         return doc;
+    }
+    
+    public int getCount() {
+    	return count;
     }
 
 }
