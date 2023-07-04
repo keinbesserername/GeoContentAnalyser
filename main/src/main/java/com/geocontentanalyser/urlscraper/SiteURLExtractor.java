@@ -141,7 +141,6 @@ public class SiteURLExtractor implements Runnable {
         String str = doc.toString();
         String findStr = "<map";
         int lastIndex = 0;
-
         while (lastIndex != -1) {
 
             lastIndex = str.indexOf(findStr, lastIndex);

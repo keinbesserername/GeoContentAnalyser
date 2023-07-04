@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -63,27 +64,11 @@ public class App {
 
         // Acquire the list of URLs from Wikipedia
         List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
-        // read each line from t.log and save to a list
-        // make it quicker for testing
-        /*
-         * List<String> wikiURLlList = new ArrayList<String>();
-         * try {
-         * 
-         * BufferedReader reader = new BufferedReader(new
-         * FileReader("output/2023-05-24T11-57.log"));
-         * String line = reader.readLine();
-         * while (line != null) {
-         * wikiURLlList.add(line);
-         * line = reader.readLine();
-         * }
-         * reader.close();
-         * } catch (Exception e) {
-         * System.out.println(e);
-         * }
-         */
+
+        // create a list to store the data objects
+        List<Data> dataList = new ArrayList<>();
+
         // Start the threads
-        ThreadManager[] threadManager = new ThreadManager[wikiURLlList.size()];
-        int i = 0;
         for (String URL : wikiURLlList) {
             threadCreation.acquireUninterruptibly();
 
@@ -91,31 +76,40 @@ public class App {
                 @Override
                 public void onDataExtracted(Data data) {
                     // System.out.println("Data extracted" + data.getBaseURL());
+                    dataList.add(data);
+
                     threadCreation.release();
                 }
             });
-            executor.execute(threadManager[i]);
-            //System.out.println("Found in ThreadManager: " + threadManager[i].countData[0]);
-            int summe = 0;
-            for(int j=0; j<i; j++) {
-            	summe+=threadManager[j].countData[0];
-            }
-            if(summe>0) {
-            	System.out.println("Found " + summe + " interaktive Karten!");
-            	BufferedWriter writer = new BufferedWriter(
-                        new FileWriter(sessionPath + File.separator + "MapCount.txt", false));
-                writer.write("Number of Maps found: " + summe);
-                writer.close();
-            }
-            i++;
+            executor.execute(threadManager);
+
         }
-        /**
-        int summe = 0;
-        for(int j=0; j<threadManager.length; j++) {
-        	summe+=threadManager[j].countData[0];
-        }
-        System.out.println("Found " + summe + " interaktive Karten!");
-        **/
         executor.shutdown();
+
+        // wait for all threads to finish
+
+        // At this point, all the data count should be in the list<Data> dataList
+        // put whatever statistic function here
+
+        // print statistics to file
+        // printStatistics(dataList, sessionPath);
+    }
+
+    public static void printStatistics(List<Data> dataList, String sessionPath) {
+        try {
+
+            BufferedWriter writer = new BufferedWriter(
+                    new FileWriter(sessionPath + File.separator + "statistic.log", false));
+            writer.write(
+                    "|Landkreis URL|Address|Coordinates|Embedded Maps|External Maps|Info Objects|\n| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |\n");
+            for (Data data : dataList) {
+                writer.append("|" + data.getBaseURL() + "|" + data.getCount_Address() + "|"
+                        + data.getCount_Coordinates() + "|" + data.getCount_EmbeddedMaps() + "|"
+                        + data.getCount_ExternalMaps() + "|" + data.getCount_InfoObjects() + "|\n");
+            }
+            writer.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 }
