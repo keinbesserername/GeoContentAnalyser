@@ -18,6 +18,7 @@ public class SiteURLExtractor implements Runnable {
     String baseURL;
     String URL;
     Data data = new Data(baseURL);
+    String noProtocolBaseURL;
 
     private Callback callback;
 
@@ -25,6 +26,7 @@ public class SiteURLExtractor implements Runnable {
         this.baseURL = baseURL;
         this.callback = callback;
         this.URL = URL;
+        this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -56,6 +58,17 @@ public class SiteURLExtractor implements Runnable {
             e.printStackTrace();
         }
 
+        // logic to handle internal redirection
+        Elements metaTags = doc.select("meta[http-equiv=Refresh]");
+        if (metaTags.size() > 0) {
+            // Get the content attribute value
+            String content = metaTags.attr("content");
+            // Extract the URL from the content attribute value
+            String redirectUrl = content.substring(content.indexOf("http"));
+            // Navigate to the redirect URL
+            doc = Jsoup.connect(redirectUrl).get();
+        }
+
         // doc = connection.get();
         // get all links
         Elements links = doc.select("a[href]");
@@ -79,7 +92,8 @@ public class SiteURLExtractor implements Runnable {
             String linkString = trackerStripper(link.attr("abs:href"));
             String strippedLink = trackerStripper(linkString);
 
-            if (strippedLink.contains(baseURL) && (!strippedLink.contains("javascript")) && isLink(strippedLink)
+            if (strippedLink.contains(noProtocolBaseURL) && (!strippedLink.contains("javascript"))
+                    && isLink(strippedLink)
                     && (strippedLink.matches(htmlPattern) || strippedLink.matches(noExtPattern))) {
 
                 set.add(linkString);
@@ -137,7 +151,7 @@ public class SiteURLExtractor implements Runnable {
             System.out.println("Retry " + retry + " " + URL);
             try {
                 // exponential backoff
-                Thread.sleep((long) (100 * Math.pow(3, retry+1)));
+                Thread.sleep((long) (100 * Math.pow(3, retry + 1)));
                 Response response = connection.method(Method.GET).execute();
                 doc = response.parse();
                 System.out.println("success " + URL);

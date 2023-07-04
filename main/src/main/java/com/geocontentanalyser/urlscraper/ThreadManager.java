@@ -1,6 +1,5 @@
 package com.geocontentanalyser.urlscraper;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.util.LinkedHashSet;
 import java.util.concurrent.BlockingQueue;
@@ -27,7 +26,7 @@ public class ThreadManager implements Runnable {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
-        this.fileName = sessionPath + File.pathSeparator + baseURL.replace("www.", "").replace("https://", "")
+        this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
     }
@@ -44,7 +43,8 @@ public class ThreadManager implements Runnable {
 
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
-        while (!blockingQueue.isEmpty()) {
+        // 1000 is the maximum number of links to be extracted
+        while (!blockingQueue.isEmpty()&& data.set.size() < 1000) {
             try {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore
@@ -68,7 +68,7 @@ public class ThreadManager implements Runnable {
             }
 
         }
-        System.out.println("Finished + " + baseURL);
+        System.out.println("Finished "+ baseURL);
         executor.shutdown();
         callback.onDataExtracted(data);
     }
@@ -78,7 +78,7 @@ public class ThreadManager implements Runnable {
     public void writeToFile(LinkedHashSet<String> URLs) {
         // write links to file
         try {
-            FileWriter writer = new FileWriter(fileName + ".log");
+            FileWriter writer = new FileWriter(fileName + ".log", true);
             if (URLs != null) {
                 for (String link : URLs) {
                     writer.write(link + "\n");
@@ -86,6 +86,7 @@ public class ThreadManager implements Runnable {
             }
             writer.close();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
