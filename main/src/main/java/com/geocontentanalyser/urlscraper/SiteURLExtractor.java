@@ -131,6 +131,27 @@ public class SiteURLExtractor implements Runnable {
         // This function presents a HTML file formatted as a JSoup document
         // You can use the JSoup API to filter the document
         // Just call it here
+        // System.out.println(doc.toString());
+        // System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
+
+        interactiveMapCount(doc);
+    }
+
+    public void interactiveMapCount(Document doc) {
+        String str = doc.toString();
+        String findStr = "<map";
+        int lastIndex = 0;
+
+        while (lastIndex != -1) {
+
+            lastIndex = str.indexOf(findStr, lastIndex);
+
+            if (lastIndex != -1) {
+                data.count_EmbeddedMaps++;
+                lastIndex += findStr.length();
+            }
+        }
+
     }
 
     public Boolean isLink(String inputString) {
@@ -163,5 +184,4 @@ public class SiteURLExtractor implements Runnable {
         }
         return doc;
     }
-
 }

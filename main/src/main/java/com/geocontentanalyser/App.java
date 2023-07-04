@@ -1,6 +1,8 @@
 package com.geocontentanalyser;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,6 +82,8 @@ public class App {
          * }
          */
         // Start the threads
+        ThreadManager[] threadManager = new ThreadManager[wikiURLlList.size()];
+        int i = 0;
         for (String URL : wikiURLlList) {
             threadCreation.acquireUninterruptibly();
 
@@ -90,8 +94,28 @@ public class App {
                     threadCreation.release();
                 }
             });
-            executor.execute(threadManager);
+            executor.execute(threadManager[i]);
+            //System.out.println("Found in ThreadManager: " + threadManager[i].countData[0]);
+            int summe = 0;
+            for(int j=0; j<i; j++) {
+            	summe+=threadManager[j].countData[0];
+            }
+            if(summe>0) {
+            	System.out.println("Found " + summe + " interaktive Karten!");
+            	BufferedWriter writer = new BufferedWriter(
+                        new FileWriter(sessionPath + File.separator + "MapCount.txt", false));
+                writer.write("Number of Maps found: " + summe);
+                writer.close();
+            }
+            i++;
         }
+        /**
+        int summe = 0;
+        for(int j=0; j<threadManager.length; j++) {
+        	summe+=threadManager[j].countData[0];
+        }
+        System.out.println("Found " + summe + " interaktive Karten!");
+        **/
         executor.shutdown();
     }
 }
