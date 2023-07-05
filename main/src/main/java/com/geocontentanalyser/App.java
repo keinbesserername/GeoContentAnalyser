@@ -76,7 +76,7 @@ public class App {
         // for (String URL : wikiURLlList) {
         threadCreation.acquireUninterruptibly();
 
-        ThreadManager threadManager = new ThreadManager("https://www.saalekreis.de/", sessionPath, eServices, new Callback() {
+        ThreadManager threadManager = new ThreadManager("https://turbinehalle-la.com/", sessionPath, eServices, new Callback() {
             @Override
             public void onDataExtracted(Data data) {
 

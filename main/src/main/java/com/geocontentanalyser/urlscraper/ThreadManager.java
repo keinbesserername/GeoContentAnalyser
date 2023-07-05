@@ -25,7 +25,7 @@ public class ThreadManager implements Runnable {
     String sessionPath;
     List<String> eServices;
 
-    public ThreadManager(String baseURL, String sessionPath,  List<String> eServices,Callback callback) {
+    public ThreadManager(String baseURL, String sessionPath, List<String> eServices, Callback callback) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
@@ -61,6 +61,7 @@ public class ThreadManager implements Runnable {
                 // but to be safe, we will limit it to 2 requests per second
                 Thread.sleep(500);
                 // System.out.println("Count right now: " + countData[0]);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -90,14 +91,15 @@ public class ThreadManager implements Runnable {
 
     // overloaded method for the first execution
     public SiteURLExtractor extractorCall(String baseURL) {
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, sessionPath, eServices,new Callback() {
-            @Override
-            public void onDataExtracted(Data newdata) {
-                data.mergeData(newdata);
-                addToQueue(data.set);
-                writeToFile(data.set);
-            }
-        });
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, sessionPath, eServices,
+                new Callback() {
+                    @Override
+                    public void onDataExtracted(Data newdata) {
+                        data.mergeData(newdata);
+                        addToQueue(data.set);
+                        writeToFile(data.set);
+                    }
+                });
         return siteURLExtractor;
     }
 
@@ -105,7 +107,7 @@ public class ThreadManager implements Runnable {
     public SiteURLExtractor extractorCall(String BaseURL, String URL) {
         // take thread count semaphore
         // start the thread
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, sessionPath, eServices,new Callback() {
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, sessionPath, eServices, new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
                 // semaphore to prevent dirty read/write
@@ -117,12 +119,28 @@ public class ThreadManager implements Runnable {
                 addToQueue(difference);
                 // write the difference to file
                 writeToFile(difference);
+                writeTemporaryData();
+                System.out.print(URL+"\n");
                 writeProtection.release();
+                
                 // release thread count semaphore
                 threadLimitSemaphore.release();
             }
         });
         return siteURLExtractor;
+    }
+
+    public void writeTemporaryData() {
+        FileWriter writer;
+        try {
+            writer = new FileWriter(fileName + ".tmp", true);
+            writer.write(data.getCount_InfoObjects() + "-" + data.getCount_EServices() + "-" + data.getCount_Address()
+                    + "-" + data.getCount_Coordinates() + "-" + data.getCount_EmbeddedMaps() + "-"
+                    + data.getCount_ExternalMaps() + "-" + data.set.size() + "\n");
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // add the links to the blocking queue

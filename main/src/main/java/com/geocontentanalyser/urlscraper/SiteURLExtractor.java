@@ -5,6 +5,8 @@ import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
@@ -45,7 +47,7 @@ public class SiteURLExtractor implements Runnable {
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
         this.eServices = eServices;
         this.infobjectExtractor = new InfobjectExtractor(this.data, this.sessionPath, false);
-        this.eServicesExtractor = new EServicesExtractor(this.data, this.sessionPath,false, eServices);
+        this.eServicesExtractor = new EServicesExtractor(this.data, this.sessionPath, false, eServices);
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -78,14 +80,20 @@ public class SiteURLExtractor implements Runnable {
         }
 
         // logic to handle internal redirection
-        Elements metaTags = doc.select("meta[http-equiv=Refresh]");
-        if (metaTags.size() > 0) {
-            // Get the content attribute value
-            String content = metaTags.attr("content");
-            // Extract the URL from the content attribute value
-            String redirectUrl = content.substring(content.indexOf("http"));
-            // Navigate to the redirect URL
-            doc = Jsoup.connect(redirectUrl).get();
+
+        try {
+            Elements metaTags = doc.select("meta[http-equiv=Refresh]");
+            if (metaTags.size() > 0) {
+                // Get the content attribute value
+                String content = metaTags.attr("content");
+                // Extract the URL from the content attribute value
+                System.out.println(content);
+                String redirectUrl = content.substring(content.indexOf("http"));
+                // Navigate to the redirect URL
+                doc = Jsoup.connect(redirectUrl).get();
+            }
+        } catch (Exception e) {
+            System.out.println("Internal redirection failed");
         }
 
         // doc = connection.get();
@@ -155,24 +163,32 @@ public class SiteURLExtractor implements Runnable {
 
         interactiveMapCount(doc);
         externalMapCount(doc);
-        this.infobjectExtractor.extract(doc, baseURL);
-        this.eServicesExtractor.extract(doc, baseURL);
+        try {
+            this.infobjectExtractor.extract(doc, baseURL);
+            this.eServicesExtractor.extract(doc, baseURL);
+        } catch (Exception e) {
+        }
     }
 
     public void interactiveMapCount(Document doc) {
         String str = doc.toString();
-        String findStr = "<map";
+        // String findStr = "<map";
+        String findStr = "<iframe";
         int lastIndex = 0;
         while (lastIndex != -1) {
 
             lastIndex = str.indexOf(findStr, lastIndex);
-
+            int endStatement = str.indexOf('>', lastIndex);
             if (lastIndex != -1) {
-                data.count_EmbeddedMaps++;
-                lastIndex += findStr.length();
+                String sub = str.substring(lastIndex, endStatement);
+                if (sub.contains("google.com/maps") || sub.contains("bing.com/maps")) {
+                    System.out.println(sub);
+                    data.count_EmbeddedMaps++;
+                    System.out.println("map found ");
+                    lastIndex += findStr.length();
+                }
             }
         }
-
     }// TODO: test this properly
 
     public void externalMapCount(Document doc) {
@@ -186,6 +202,20 @@ public class SiteURLExtractor implements Runnable {
                 data.count_ExternalMaps++;
             }
         }
+    }
+
+    public void addressFilter(Document doc)
+
+    {
+        String input = "Some text before the address\nWörthstraße 15\n36037 Fulda\nSome text after the address";
+        String regex = "\\b\\d{1,3}\\s?[a-zA-ZäöüÄÖÜß]+\\s+\\d{5}\\s+[a-zA-ZäöüÄÖÜß]+\\b";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String address = matcher.group();
+            System.out.println(address);
+        }
+
     }
 
     public Boolean isLink(String inputString) {
@@ -203,17 +233,17 @@ public class SiteURLExtractor implements Runnable {
         Document doc = new Document("");
         // retry 3 times if socket times out
         while (retry < 3) {
-            //System.out.println("Retry " + retry + " " + URL);
+            // System.out.println("Retry " + retry + " " + URL);
             try {
                 // exponential backoff
                 Thread.sleep((long) (100 * Math.pow(3, retry + 1)));
                 Response response = connection.method(Method.GET).execute();
                 doc = response.parse();
-                //System.out.println("success " + URL);
+                // System.out.println("success " + URL);
                 break;
             } catch (Exception e) {
                 retry++;
-                //System.out.println("failed");
+                // System.out.println("failed");
             }
         }
         return doc;
