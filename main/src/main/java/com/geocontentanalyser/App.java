@@ -75,8 +75,10 @@ public class App {
             ThreadManager threadManager = new ThreadManager(URL, sessionPath, new Callback() {
                 @Override
                 public void onDataExtracted(Data data) {
-                    // System.out.println("Data extracted" + data.getBaseURL());
+
                     dataList.add(data);
+                    System.out.println("Data extracted" + data.getBaseURL());
+                    System.out.println("Embedded maps count: " + data.getCount_EmbeddedMaps());
 
                     threadCreation.release();
                 }

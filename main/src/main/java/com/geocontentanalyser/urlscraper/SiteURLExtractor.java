@@ -135,6 +135,7 @@ public class SiteURLExtractor implements Runnable {
         // System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
 
         interactiveMapCount(doc);
+        externalMapCount(doc);
     }
 
     public void interactiveMapCount(Document doc) {
@@ -151,6 +152,18 @@ public class SiteURLExtractor implements Runnable {
             }
         }
 
+    }//TODO: test this properly
+    public void externalMapCount(Document doc) {      
+        //Get all links
+        Elements links = doc.select("a[href]");
+        // filter for google maps or bing maps
+        for (Element link_Element : links) {
+            //convert to absolute link
+            String link = link_Element.attr("abs:href");
+            if (link.contains("google.com/maps")|| link.contains("bing.com/maps")) {
+                data.count_ExternalMaps++;
+            }
+        }      
     }
 
     public Boolean isLink(String inputString) {
