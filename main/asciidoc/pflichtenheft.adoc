@@ -7,6 +7,7 @@
 |===
 |Version| Status    | Bearbeitungsdatum | Autoren(en)        |  Vermerk
 |0.1    | In Arbeit | 09.05.2023        | Leon Kunze         | Initiale Version
+|1.0    | Finale Version | 05.07.2023        | Leon Kunze     | Finalisierung
 |===
 
 == Zusammenfassung
@@ -81,14 +82,6 @@ die Struktur des Softwaresystems dar und beschreiben die Softwarekomponenten, ih
 
 Die Software wird aktuell aus den folgenden Komponenten zusammengestellt:
 
-//TODO
-[[Komponentendiagramm]] 
-image::./models/analysis/Komponentendiagramm.png[Komponentendiagramm, 100%, 100%, pdfwidth=100%, title= "Komponentendiagramm von {project_name}", align=center, caption="Abbildung 1: "]
-
-
-// Beschreibung des Komponentendiagramms kommt hier
-
-
 == Anwendungsfälle
 In diesem Abschnitt werden die grundlegenden Funktionalitäten der Anwendung
 in Form von Anwendungsfällen übersichtlich für alle Anwendergruppen aufgeführt.
@@ -107,12 +100,6 @@ zusätzlich eine hierarchische Gruppierung mehrerer, untergeordneter Akteure.
 |Name                       |Beschreibung
 |_Auftraggeber_  			|Person, die das Softwaretool abnimmt
 |===
-
-=== Überblick Anwendungsfalldiagramm
-
-//TODO
-[[Anwendungsfalldiagramm]]
-image::./models/analysis/Anwendungsfalldiagramm.png[Anwendungsfalldiagramm, 100%, 100%, pdfwidth=100%, title= "Anwendungsfalldiagramm von {project_name}", align=center, caption="Abbildung 2: "]
 
 === Anwendungsfallbeschreibungen
 
@@ -192,10 +179,6 @@ pro Datensatz
 |Erweiterungen              |-
 |Funktionale Anforderungen  |<<AF0105>>
 |===
-
-//TODO selber Entscheiden wo ein Sequenzdiagramm angemessen ist :)
-[[/* INSERT NAME HERE */]]
-image::./models/analysis/Sequenzdiagramme/INSERT_NAME_HERE[/* SAME AS HEADER */, 80%, 80%, pdfwidth=80%, title= "Sequenzdiagramm zu << /* INSERT ID HERE */>>", align=center, caption="Abbildung 3: "]
 
 == Funktionale Anforderungen
 In diesem Abschnitt erfolgt eine Übersicht über alle funktionalen Anforderungen an den GeoContentAnalyser.
@@ -301,25 +284,12 @@ Die für die Anwendung erforderlichen nicht-funktionalen Anforderungen ergeben s
 Ein Klassendiagramm beschreibt Systeme, indem es Klassen, deren Attribute und Operationen sowie die Beziehungen 
 zwischen den Klassen aufzeigt.
 
-//TODO
-image::./models/analysis/Klassendiagramm.png[Klassendiagramm,1201,800, pdfwidth=100%, title= "Klassendiagramm von {project_name}", align=center, caption="Abbildung 4: "]
-
-=== Klassen und Enumerationen
-
-//TODO
-[options="header", cols="1h, 4"]
-|===
-|Klasse           |Beschreibung
-
-|===
 == Akzeptanztestfälle
 In diesem Abschnitt werden Testfälle angegeben, um die fertige Anwendung auf die Erfüllung der funktionalen und 
 nicht-funktionalen Anforderungen hin zu überprüfen. Dazu werden die bereits ausformulierten Anwendungsfälle zur
 Grundlage gemacht und vordefinierte Eingaben und Handlungsfolgen daraufhin abgetestet. Aus den Testfällen wird im 
 späteren Verlauf ein Testplan erstellt, der die Testausführung präzisiert und als Vorgabe für die Tests der Endnutzer 
 dient.
-
-//TODO (mach ich vieleicht selber)
 
 == Glossar
 Das Glossar beinhaltet sämtliche Begriffe, die innerhalb des Projektes verwendet werden und deren gemeinsames 

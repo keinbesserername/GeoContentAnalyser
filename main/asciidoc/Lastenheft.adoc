@@ -7,6 +7,7 @@
 |===
 |Version| Status    | Bearbeitungsdatum | Autoren(en)    |  Vermerk
 |0.1    | In Arbeit | 22.04.2023        | Leon Kunze     | Initiale Version
+|1.0    | Finale Version | 05.07.2023        | Leon Kunze     | Finalisierung
 |===
 
 == Systemziele
