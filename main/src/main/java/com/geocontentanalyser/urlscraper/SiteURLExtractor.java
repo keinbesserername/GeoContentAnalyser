@@ -38,8 +38,8 @@ public class SiteURLExtractor implements Runnable {
         this.sessionPath = sessionPath;
         this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
-        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.data, "infobjects", this.time, false);
-        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.data, "e-services", this.time, false);
+        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.data, this.sessionPath, false);
+        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.data, this.sessionPath, false);
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -150,7 +150,7 @@ public class SiteURLExtractor implements Runnable {
         interactiveMapCount(doc);
         externalMapCount(doc);
         this.infobjectExtractor.extract(doc, baseURL);
-        //this.eServicesExtractor.extract(doc, baseURL);
+        this.eServicesExtractor.extract(doc, baseURL);
     }
 
     public void interactiveMapCount(Document doc) {

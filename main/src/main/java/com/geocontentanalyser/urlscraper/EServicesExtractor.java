@@ -24,8 +24,6 @@ public class EServicesExtractor extends Thread{
     private Data data;
     // html doc
     private Document doc;
-    // infobject files' names are unique based on the time of search
-    private String time;
     // keeps track of number of found infobjects in general
     public Integer eservice_counter_global = 0;    
     // 
@@ -36,7 +34,6 @@ public class EServicesExtractor extends Thread{
     private String directory;
     // current file, to which infobjects are stored (unique for each landkreis)
     public String filename;
-    private String filename_base;
     // "simplify" flag is used not to place the output in "capsules" anymore,
     // it is useful for parcing of infobject.txt files (yet to be implemented)
     public Boolean simplify;
@@ -53,13 +50,11 @@ public class EServicesExtractor extends Thread{
     //
     public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
 
-    EServicesExtractor(String url, Data data, String sessionPfad, String time, Boolean simplify){
+    EServicesExtractor(String url, Data data, String sessionPfad, Boolean simplify){
 
         // create a folder for the duration of the whole search
         this.data = data;
-        this.time = time;
-        this.filename_base = sessionPfad;
-        this.directory = filename_base + File.separator + this.time;  
+        this.directory = sessionPfad;
         File dir = new File(this.directory);
         dir.mkdirs();
 
@@ -124,7 +119,7 @@ public class EServicesExtractor extends Thread{
                 if(semaphore.tryAcquire()){
                     semaphore.release();
                     this.threads.get(thread_semaphores.indexOf(semaphore)).configure(doc, this.filename, this.current_landkreis);
-                    this.threads.get(thread_semaphores.indexOf(semaphore)).extract();   
+                this.threads.get(thread_semaphores.indexOf(semaphore)).extract();   
                     break;      
                 }
             }
