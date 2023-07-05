@@ -80,7 +80,7 @@ public class EServicesExtractor extends Thread{
             while((line = br.readLine()) != null) {
                 String[] values = line.split(";");
                 if(values.length >= 6){
-                    if(values[5].length() >= 5){
+                    if(values[5].replaceAll("[0-9]", "").length() >= 5){
                         eServices.add(values[5]);
                     }                    
                 }                

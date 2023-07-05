@@ -4,77 +4,91 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class InfobjectExtractrorThread extends Thread {
-    // the html document being parsed
-    private Document doc;
+    // unique identifier
+    public Integer id;
     // main class is passed to an instance of this thread class in order to change the former's attributes, that are global for all infobjects
     private InfobjectExtractor infobjectExtractor;
+    // determines, if infobjects should be dumped into "capsules" in infobject.txt files (to be implemented)
+    private Boolean simplify;
+
+    // the html document being parsed
+    private Document doc;
     // where is being written (full path from the project's root)
     private String filename;
     //
     private String current_landkreis;
-    // determines, if infobjects should be dumped into "capsules" in infobject.txt files (to be implemented)
-    private Boolean simplify;
 
+    
+    // parameters of infobjects 
+    private HashMap<String,String> infobject_features = new HashMap<>();
 
-    // keeps track of number of found infobjects on a given site
-    private Integer infobject_counter = 0;
-    // parameters of an infobject                
-    private String title, url, address, email, telephone, open_times, map, coordinates;
+    // parameters of an infobject by default               
+    private String default_title, default_url, default_address, default_email, default_telephone, default_open_times, default_coordinates;
     // biggest length from all of the parameters (for closing bars in infobject.txt; for more info check out draw_right_bar() funciton)
     private Integer biggest_length;
 
     // list of found containers, not to search for them multiple times
     private Elements containers, text_tags;
 
-    InfobjectExtractrorThread(Document doc, InfobjectExtractor infobjectExtractor, String filename, String current_landkreis, Boolean simplify){
-        this.doc = doc;
+    InfobjectExtractrorThread(InfobjectExtractor infobjectExtractor, Integer id, Boolean simplify){
         this.infobjectExtractor = infobjectExtractor;
-        this.filename = filename;
-        this.current_landkreis = current_landkreis;
+        this.id = id;
         this.simplify = simplify;
+
+        // implement or drop simplified output
+        if(this.simplify){
+            this.default_title =       "Title       :";                
+            this.default_url =         "URL         :";
+            this.default_address =     "Address     :";
+            this.default_email =       "Email       :";
+            this.default_telephone =   "Telephone   :";
+            this.default_open_times =  "Open times  :";
+            this.default_coordinates = "Coordinates :";
+        }else{
+            this.default_title =       "| Title       |  -----> ";                
+            this.default_url =         "| URL         | "        ;
+            this.default_address =     "| Address     | "        ;
+            this.default_email =       "| Email       | "        ;
+            this.default_telephone =   "| Telephone   | "        ;
+            this.default_open_times =  "| Open times  | "        ;
+            this.default_coordinates = "| Coordinates | "        ;
+        }
     }
 
-    // used from start() to set up the baseline parameter values for an infobject
-    private void configure(){
-        this.title =       "| Title       |  -----> ";                
-        this.url =         "| URL         | " +  this.doc.location();
-        this.address =     "| Address     | ";
-        this.email =       "| Email       | ";
-        this.telephone =   "| Telephone   | ";
-        this.open_times =  "| Open times  | ";
-        this.map =         "| Map         | ";
-        this.coordinates = "| Coordinates | ";
 
-        this.biggest_length = this.url.length();
+
+    // used from start() to set up the baseline parameter values for an infobject
+    public void configure(Document doc, String filename, String current_landkreis){
+        this.doc = doc;
+        this.filename = filename;
+        this.current_landkreis = current_landkreis;
+
+        infobject_features.put("title", this.default_title);
+        infobject_features.put("title", this.default_title);                
+        infobject_features.put("url", this.default_url +  this.doc.location());
+        infobject_features.put("address", this.default_address);
+        infobject_features.put("email", this.default_email);
+        infobject_features.put("telephone", this.default_telephone);
+        infobject_features.put("open_times", this.default_open_times);
+        infobject_features.put("coordinates", this.default_coordinates);
+
+        this.biggest_length = this.infobject_features.get("url").length();
 
         this.containers = this.doc.select("span,td,div");
         this.text_tags = this.doc.select("p,span,text");
-
-        // add url to the list to avoid dublicates, that can occur if the recursive depth is set as high
-        this.infobjectExtractor.found_urls.add(this.doc.location());
     }    
-
-    private String findMap(){
-        Elements iframes = this.doc.select("iframe");
-        for(Element iframe : iframes){
-            for(Attribute attr : iframe.attributes()){
-                if (attr.getValue().contains("google.com/maps")){ //  maybe, just replace with "map" of "maps"
-                    this.infobjectExtractor.map_counter += 1;
-                    return attr.getValue();
-                }
-            }
-        }
-        return "not found";
-    }
 
     private String findCoordinates(){
         // search for degrees, minutes, & seconds
@@ -123,10 +137,10 @@ public class InfobjectExtractrorThread extends Thread {
             // trying to get the whole address from parrent element
             if(!indexes.isEmpty()){
                 // trying to find email in the block of address
-                this.email += findEmail(addressContainer);
+                this.infobject_features.put("email", this.default_email + findEmail(addressContainer));
                     
                 // trying to find phone number in the block of address           
-                this.telephone +=findTelephone(addressContainer);
+                this.infobject_features.put("telephone", this.default_telephone + findTelephone(addressContainer));
 
                 // searching for the direct reference
                 addressContainer = element.parent().text();
@@ -192,10 +206,20 @@ public class InfobjectExtractrorThread extends Thread {
         String[] header_tags = {"h1","h2","h3"};
         for(String tag : header_tags){
             if(!this.doc.select(tag).isEmpty()){
-            return this.doc.select(tag).first().text() + "  <-----";
+                if(this.simplify){
+                    return this.doc.select(tag).first().text();
+                }else{
+                    return this.doc.select(tag).first().text() + "  <-----";
+                }
+            
             }
         }
-        return this.doc.title() + "  <-----";
+        if(this.simplify){
+            return this.doc.title();
+        }else{
+            return this.doc.title() + "  <-----";
+        }
+        
     }
 
     private String findEmail(String text){
@@ -285,7 +309,7 @@ public class InfobjectExtractrorThread extends Thread {
     // functions for formalisation of output into infobject.txt
 
     // draw a bar, that has a length, no less than of the longest textual representation of an infobjects field (most likely, URL)
-    private void draw_vertical_bar(FileWriter writer){
+    private void draw_horizontal_bar(FileWriter writer){
         Integer i = 0;
         try{
             while(i < this.biggest_length + 5){
@@ -307,108 +331,138 @@ public class InfobjectExtractrorThread extends Thread {
         string = string + "|\n";
         return string;
     }
+
+    // if a page looks like an infobject page, we try to parse it 
+
+    private void parse(){
+        // search for coordinate pairs (even if it's not an infobject page)
+        this.infobject_features.put("coordinates", this.default_coordinates + findCoordinates());
+
+        // regex search for address
+        this.infobject_features.put("address", this.default_address + findAddress());
+        
+        // it is an infobject, only if it has physical address, otherwise, it's a missmatch
+        if(this.infobject_features.get("address") != this.default_address){
+
+            // searching tile
+            this.infobject_features.put("title", this.default_title + findTitle());
+
+            // find open times, if they haven't yet been found
+            this.infobject_features.put("open_times", this.default_open_times + findOpenTimes());
+            
+            // searching for email, if it hadn't been yet found
+            if(this.infobject_features.get("email") == this.default_email){
+                this.infobject_features.put("email", this.default_email + findEmail(this.doc.text()));
+            } 
+
+            // searching for phone number, if it hadn't been yet found
+            if(this.infobject_features.get("telephone") == this.default_telephone){
+                this.infobject_features.put("telephone", this.default_telephone + findTelephone(this.doc.text()));
+            } 
+            
+            // wait for semaphore's availability
+            try{
+                this.infobjectExtractor.fileSemaphore.acquire();
+            }
+            catch(InterruptedException e){
+            }
+
+            // incrementing the infobject counter
+            this.infobjectExtractor.infobject_counter_global++;
+        }
+    }    
     
-    @Override
-    public void run(){
-         
+    // write all findings to the file
+    private void save_results(){
+
+        // add url to the list to avoid dublicates, that can occur if the recursive depth is set as high
+        this.infobjectExtractor.found_urls.add(this.doc.location());
+        
+        // output global metrics
+        try{
+            RandomAccessFile file = new RandomAccessFile(this.filename, "rw");
+
+            // found infobjects and maps
+            byte[] bytes = 
+            (this.current_landkreis + 
+            "\nInfobjects Found: " + this.infobjectExtractor.infobject_counter_global + 
+            "\nUnique Addresses Found: " + this.infobjectExtractor.found_addresses.size() +
+            "\nCoordinate Pairs Found: " + this.infobjectExtractor.found_coordinates.size() + "\n\n\n").getBytes();
+
+            file.write(bytes, 0, bytes.length);
+
+            file.close();
+        }
+        catch(IOException e){
+        }
+
+        // writing the found in the file
+        try {
+            FileWriter writer = new FileWriter(this.filename, true);
+
+            if(this.simplify){
+                for(HashMap.Entry<String, String> feature : this.infobject_features.entrySet()){
+                    writer.write(feature.getValue());
+                }
+                writer.write("\n\n\n");
+                writer.close();                
+            }else{
+                // separator
+                writer.write("/");
+                this.draw_horizontal_bar(writer);
+                writer.write("\\\n");
+
+                // found features
+                for(HashMap.Entry<String, String> feature : this.infobject_features.entrySet()){
+                    writer.write(this.draw_right_bar(feature.getValue()));
+                }
+
+                // bottom separator
+                writer.write("\\");
+                this.draw_horizontal_bar(writer);
+                writer.write("/ \n\n\n");
+                writer.close();                
+            }
+            
+        } catch (IOException e) {
+        }
+
+        this.infobjectExtractor.fileSemaphore.release();
+    }
+    
+    // root function
+
+    public void extract(){
+        
+        // get semaphore
+        try{
+            this.infobjectExtractor.thread_semaphores.get(id).acquire();
+        }catch(InterruptedException e){
+        }
+
+        // figure out, if it is an infobject page 
         for(String item : this.infobjectExtractor.infobjects){                  
-            if(this.doc.location().contains(item) && !this.infobjectExtractor.found_urls.contains(doc.location())){
-                // return parameters to default
-                this.configure();
-                
-                // search for a map and coordinate pairs (even if it's not an infobject page)
-                this.map += this.findMap();
-                this.coordinates += this.findCoordinates();
-
-                // regex search for address
-                this.address += this.findAddress();
-                
-                // it is an infobject, only if it has physical address, otherwise, it's a missmatch
-                if(address != "| Address     | "){
-
-                    // searching tile
-                    this.title += this.findTitle();
-
-                    // find open times, if they haven't yet been found
-                    this.open_times += this.findOpenTimes();
-                    
-                    // searching for email, if it hadn't been yet found
-                    if(this.email == "| Email       | "){
-                        this.email += this.findEmail(this.doc.text());
-                    } 
-
-                    // searching for phone number, if it hadn't been yet found
-                    if(telephone == "| Telephone   | "){
-                        this.telephone += this.findTelephone(this.doc.text());
-                    } 
-                    
-                    // wait for semaphore's availability
-                    try{
-                        this.infobjectExtractor.fileSemaphore.acquire();
-                    }
-                    catch(InterruptedException e){
-                    }
-
-                    // incrementing the infobject counter
-                    this.infobjectExtractor.infobject_counter_global++;
-                    try{
-                        RandomAccessFile file = new RandomAccessFile(this.filename, "rw");
-
-                        // found infobjects and maps
-                        byte[] bytes = 
-                        (this.current_landkreis + 
-                        "\nInfobjects Found: " + this.infobjectExtractor.infobject_counter_global + 
-                        "\nMaps Found: " + this.infobjectExtractor.map_counter + 
-                        "\nUnique Addresses Found: " + this.infobjectExtractor.found_addresses.size() +
-                        "\nCoordinate Pairs Found: " + this.infobjectExtractor.found_coordinates.size() + "\n\n\n").getBytes();
-
-                        file.write(bytes, 0, bytes.length);
-
-                        file.close();
-                    }
-                    catch(IOException e){
-                    }
-
-                    // writing the found in the file
-                    try {
-                        FileWriter writer = new FileWriter(this.filename, true);
-                        // separator
-                        writer.write("/");
-                        this.draw_vertical_bar(writer);
-                        writer.write("\\ \n");
-                        // header
-                        writer.write(this.draw_right_bar(this.title));
-                        // url
-                        writer.write(this.draw_right_bar(this.url));
-                        // physical address
-                        writer.write(this.draw_right_bar(this.address));
-                        // open times
-                        writer.write(this.draw_right_bar(this.open_times));
-                        // email
-                        writer.write(this.draw_right_bar(this.email));
-                        // phone number
-                        writer.write(this.draw_right_bar(this.telephone));
-                        // map url
-                        writer.write(this.draw_right_bar(this.map));
-                        // bottom separator
-                        writer.write("\\");
-                        this.draw_vertical_bar(writer);
-                        writer.write("/ \n\n\n");
-                        writer.close();
-                    } catch (IOException e) {
-                    }
-
-                    this.infobjectExtractor.fileSemaphore.release();
+            if(this.doc.location().contains(item)){
+                if(!this.infobjectExtractor.found_urls.contains(doc.location())){
+                    // main process of the class
+                    this.parse();
+                    this.save_results();     
+                    break;  
                 }
             }
-        }  
+        }
+
+        //release semaphore
+        this.infobjectExtractor.thread_semaphores.get(id).release();
+
     }
 
-    // in case, a destructor is need in the future instances of the project
+    // thread function
     @Override
-    protected void finalize() throws Throwable {
-        // TODO Auto-generated method stub
-        super.finalize();
+    public void run(){
+        
+        this.extract();
+        
     }
     
 }
