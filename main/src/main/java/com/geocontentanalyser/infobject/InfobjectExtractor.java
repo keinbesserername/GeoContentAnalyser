@@ -8,6 +8,8 @@ import java.util.concurrent.Semaphore;
 
 import org.jsoup.nodes.*;
 
+import com.geocontentanalyser.urlscraper.Data;
+
 // extention of Thread is needed for usage of semaphores
 
 public class InfobjectExtractor extends Thread{
@@ -16,6 +18,8 @@ public class InfobjectExtractor extends Thread{
     // initialise variables
     //
      
+    // where global variables go
+    private Data data;
     // infobject files' names are unique
     private String time;
     // keeps track of number of found infobjects in general
@@ -26,6 +30,7 @@ public class InfobjectExtractor extends Thread{
     private String directory;
     // current file, to which infobjects are stored (unique for each landkreis)
     public String filename;
+    private String filename_base;
     // "simplify" flag is used not to place the output in "capsules" anymore,
     // it is useful for parcing of infobject.txt files
     public Boolean simplify;
@@ -55,10 +60,11 @@ public class InfobjectExtractor extends Thread{
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
     public Semaphore fileSemaphore = new Semaphore(1, isAlive());
 
-    public InfobjectExtractor(String baseURL, String time, Boolean simplify){
+    public InfobjectExtractor(String baseURL, Data data, String sessionPfad, String time, Boolean simplify){
         // create a folder for the duration of the whole search
         this.time = time;
-        this.directory = "output" + File.separator + this.time + File.separator + "infobjects" + File.separator;
+        this.filename_base = sessionPfad;
+        this.directory = this.filename_base + File.separator + this.time;
         File dir = new File(this.directory);
         dir.mkdirs();
 
@@ -80,7 +86,10 @@ public class InfobjectExtractor extends Thread{
 
     // root function of the class
 
-    public void extract(Document doc){
+    public void extract(Document doc, String baseURL){
+        reconfigure(baseURL);
+        this.data.setCount_InfoObjects(this.infobject_counter_global);
+
         Integer id = 0;
         if(this.threads.size() < 14){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));

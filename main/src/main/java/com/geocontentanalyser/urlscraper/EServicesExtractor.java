@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -19,6 +20,9 @@ public class EServicesExtractor extends Thread{
     // initialise variables
     //
 
+    // where glbal variables go
+    private Data data;
+    // html doc
     private Document doc;
     // infobject files' names are unique based on the time of search
     private String time;
@@ -32,6 +36,7 @@ public class EServicesExtractor extends Thread{
     private String directory;
     // current file, to which infobjects are stored (unique for each landkreis)
     public String filename;
+    private String filename_base;
     // "simplify" flag is used not to place the output in "capsules" anymore,
     // it is useful for parcing of infobject.txt files (yet to be implemented)
     public Boolean simplify;
@@ -48,11 +53,13 @@ public class EServicesExtractor extends Thread{
     //
     public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
 
-    EServicesExtractor(String url, String time, Boolean simplify){
+    EServicesExtractor(String url, Data data, String sessionPfad, String time, Boolean simplify){
 
         // create a folder for the duration of the whole search
+        this.data = data;
         this.time = time;
-        this.directory = "output" + File.separator + this.time + File.separator + "eservices" + File.separator;  
+        this.filename_base = sessionPfad;
+        this.directory = filename_base + File.separator + this.time;  
         File dir = new File(this.directory);
         dir.mkdirs();
 
@@ -101,7 +108,10 @@ public class EServicesExtractor extends Thread{
     // main function
     //
 
-    public void extract(Document doc){
+    public void extract(Document doc, String baseURL){
+        this.data.setCount_EServices(this.eservice_counter_global);
+        this.reconfigure(baseURL);
+
         Integer id = 0;
         if(this.threads.size() < 14){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));

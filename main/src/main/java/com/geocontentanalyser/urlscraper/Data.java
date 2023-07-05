@@ -6,6 +6,7 @@ public class Data {
     // This class stores the counts of the different types of data
     String baseURL;
     int count_InfoObjects;
+    int count_EServices;
     int count_Address;
     int count_Coordinates;
     int count_EmbeddedMaps;
@@ -15,6 +16,7 @@ public class Data {
     public Data(String baseURL) {
         this.baseURL = baseURL;
         this.count_InfoObjects = 0;
+        this.count_EServices = 0;
         this.count_Address = 0;
         this.count_Coordinates = 0;
         this.count_EmbeddedMaps = 0;
@@ -36,6 +38,14 @@ public class Data {
 
     public void setCount_InfoObjects(int count_InfoObjects) {
         this.count_InfoObjects = count_InfoObjects;
+    }
+
+    public int getCount_EServices() {
+        return count_EServices;
+    }
+
+    public void setCount_EServices(int count_EServices){
+        this.count_EServices = count_EServices;
     }
 
     public int getCount_Address() {
