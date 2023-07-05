@@ -63,16 +63,16 @@ public class App {
         Semaphore threadCreation = new Semaphore(30, true);
 
         // Acquire the list of URLs from Wikipedia
-        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+        //List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
 
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
 
         // Start the threads
-        for (String URL : wikiURLlList) {
+        //for (String URL : wikiURLlList) {
             threadCreation.acquireUninterruptibly();
 
-            ThreadManager threadManager = new ThreadManager(URL, sessionPath, new Callback() {
+            ThreadManager threadManager = new ThreadManager("https://www.saalekreis.de/", sessionPath, new Callback() {
                 @Override
                 public void onDataExtracted(Data data) {
 
@@ -85,7 +85,7 @@ public class App {
             });
             executor.execute(threadManager);
 
-        }
+        //}
         executor.shutdown();
 
         // wait for all threads to finish
