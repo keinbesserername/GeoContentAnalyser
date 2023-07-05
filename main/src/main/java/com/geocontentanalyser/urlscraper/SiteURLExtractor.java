@@ -2,10 +2,6 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
@@ -18,11 +14,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class SiteURLExtractor implements Runnable {
-    LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
-    String fileName;
-    String time;
-    InfobjectExtractor infobjectExtractor;
-    EServicesExtractor eServicesExtractor;
 
     String baseURL;
     String URL;
@@ -36,10 +27,6 @@ public class SiteURLExtractor implements Runnable {
         this.callback = callback;
         this.URL = URL;
         this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
-        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
-        this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
-        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.time, false);
-        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.time, false);
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -137,11 +124,6 @@ public class SiteURLExtractor implements Runnable {
         linkParts = output.split("\\?");
         output = linkParts[0];
         return output;
-    }
-    
-    public void filter(Document doc) {       
-        this.infobjectExtractor.extract(doc);
-        //this.eServicesExtractor.extract(doc);
     }
 
     public void filter(Document doc) {
