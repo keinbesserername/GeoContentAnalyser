@@ -149,8 +149,13 @@ public class SiteURLExtractor implements Runnable {
 
         interactiveMapCount(doc);
         externalMapCount(doc);
+<<<<<<< HEAD
         this.infobjectExtractor.extract(doc, baseURL);
         this.eServicesExtractor.extract(doc, baseURL);
+=======
+        //this.infobjectExtractor.extract(doc, baseURL);
+        //this.eServicesExtractor.extract(doc, baseURL);
+>>>>>>> 67811ef7c945564cc808caab59a714381fe76a07
     }
 
     public void interactiveMapCount(Document doc) {

@@ -63,6 +63,7 @@ public class InfobjectExtractor extends Thread{
         File dir = new File(this.directory);
         dir.mkdirs();
 
+        this.data = data;
         // root url is used to separate infobjects by files, depending on their landkreis attachment
         reconfigure(baseURL);      
         
