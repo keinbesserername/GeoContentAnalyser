@@ -115,7 +115,7 @@ public class SiteURLExtractor implements Runnable {
 
     public void filter(Document doc) {       
         this.infobjectExtractor.extract(doc);
-        this.eServicesExtractor.extract(doc);
+        //this.eServicesExtractor.extract(doc);
     }
 
 }

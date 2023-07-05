@@ -42,17 +42,21 @@ public class EServicesExtractor extends Thread{
     public List<String> eServices = this.parse_eservices();
 
     // gets populated with InfobjectExtractorThread classes with each new doc being parsed by SiteURLExtractor
-    private ArrayList<Thread> threads = new ArrayList<Thread>();
+    private ArrayList<EServicesExtractorThread> threads = new ArrayList<EServicesExtractorThread>();
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
     public Semaphore fileSemaphore = new Semaphore(1, isAlive());
+    //
+    public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
 
     EServicesExtractor(String url, String time, Boolean simplify){
 
         // create a folder for the duration of the whole search
         this.time = time;
-        this.directory = "output" + File.separator + this.time + File.separator + "eservices" + File.separator;
+        this.directory = "output" + File.separator + this.time + File.separator + "eservices" + File.separator;  
         File dir = new File(this.directory);
         dir.mkdirs();
+
+        reconfigure(url);
 
         // root url is used to separate infobjects by files, depending on their landkreis attachment
         // reconfigure(baseURL); 
@@ -98,9 +102,24 @@ public class EServicesExtractor extends Thread{
     //
 
     public void extract(Document doc){
-        this.doc = doc;
-        this.threads.add(new EServicesExtractorThread(this.doc, this, this.directory, this.current_landkreis, this.simplify));
-        this.threads.get(this.threads.size() - 1).start();
+        Integer id = 0;
+        if(this.threads.size() < 14){
+            this.thread_semaphores.add(new Semaphore(1, isAlive()));
+            this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify));
+            this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);
+            this.threads.get(this.threads.size() - 1).start();
+            id++;
+        }else{
+            for(Semaphore semaphore : this.thread_semaphores){
+                if(semaphore.tryAcquire()){
+                    semaphore.release();
+                    this.threads.get(thread_semaphores.indexOf(semaphore)).configure(doc, this.filename, this.current_landkreis);
+                    this.threads.get(thread_semaphores.indexOf(semaphore)).extract();   
+                    break;      
+                }
+            }
+        }      
+
     }
 
     

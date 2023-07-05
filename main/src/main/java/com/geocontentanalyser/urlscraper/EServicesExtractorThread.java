@@ -22,6 +22,7 @@ public class EServicesExtractorThread extends Thread {
     private EServicesExtractor eServicesExtractor;
     private Boolean simplify;
     private Boolean found = false;
+    public Integer id;
 
     // parameters of an eservice
 
@@ -30,13 +31,11 @@ public class EServicesExtractorThread extends Thread {
     private String default_title, default_url;
     private String current_landkreis;
 
-    EServicesExtractorThread(Document doc, EServicesExtractor eServicesExtractor, String directory, String current_landkreis, Boolean simplify){
-        this.doc = doc;
+    EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify){
+        this.id = id;
         this.eServicesExtractor = eServicesExtractor;
         this.eServices = this.eServicesExtractor.eServices;
         this.simplify = simplify;
-        this.filename = directory + File.separator + current_landkreis.replaceAll("http(s)?://", "") + ".txt";
-        this.current_landkreis = current_landkreis;
 
         if(this.simplify){
             this.default_title =       "Title       :";
@@ -53,11 +52,13 @@ public class EServicesExtractorThread extends Thread {
 
     // used from start() to set up the baseline parameter values for an infobject
 
-    private void configure(){
+    public void configure(Document doc, String filename, String current_landkreis){
+        this.doc = doc;
+        this.filename = filename;
+        this.current_landkreis = current_landkreis;
+
         this.title =      this.default_title;                
         this.url =        this.default_url +  this.doc.location();
-
-        // this.biggest_length = this.url.length();
 
         // add url to the list to avoid dublicates, that can occur if the recursive depth is set as high
         this.eServicesExtractor.found_urls.add(this.doc.location());
@@ -125,9 +126,7 @@ public class EServicesExtractorThread extends Thread {
     // the main function
     //
 
-    @Override
-    public void start(){
-        this.configure();
+    public void extract(){
 
         this.title += findTitle();
 
@@ -184,5 +183,11 @@ public class EServicesExtractorThread extends Thread {
         }
     }
 
+    // thread function
+
+    @Override
+    public void start(){
+       this.extract();
+    }
 
 }
