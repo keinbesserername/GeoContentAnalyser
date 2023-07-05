@@ -23,12 +23,6 @@ import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
 public class App {
 
-<<<<<<< HEAD
-=======
-    InfobjectExtractor infobjectExtractor = new InfobjectExtractor(data, sessionPath, false);
-    EServicesExtractor eServicesExtractor = new EServicesExtractor(data, sessionPath, false);
-
->>>>>>> 2e96852da3718d7a8e92c93cacce96e450341eb6
     public static void main(String[] args) throws IOException {
 
         System.out.println(

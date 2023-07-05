@@ -33,7 +33,6 @@ public class EServicesExtractorThread extends Thread {
     EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify){
         this.id = id;
         this.eServicesExtractor = eServicesExtractor;
-        this.eServices = this.eServicesExtractor.eServices;
         this.simplify = simplify;
 
         if(this.simplify){

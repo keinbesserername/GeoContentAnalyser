@@ -36,8 +36,6 @@ public class ThreadManager implements Runnable {
         this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
-        this.infobjectExtractor = infobjectExtractor;
-        this.eServicesExtractor = eServicesExtractor;
     }
 
     @Override
