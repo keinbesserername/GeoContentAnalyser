@@ -1,4 +1,4 @@
-package com.geocontentanalyser.urlscraper;
+package com.geocontentanalyser.eService;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,10 +30,11 @@ public class EServicesExtractorThread extends Thread {
     private String default_title, default_url;
     private String current_landkreis;
 
-    EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify){
+    public EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify, List<String> eServices){
         this.id = id;
         this.eServicesExtractor = eServicesExtractor;
         this.simplify = simplify;
+        this.eServices = eServices;
 
         if(this.simplify){
             this.default_title =       "Title       :";

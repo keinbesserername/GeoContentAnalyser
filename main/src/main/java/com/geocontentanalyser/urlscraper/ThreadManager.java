@@ -2,13 +2,12 @@ package com.geocontentanalyser.urlscraper;
 
 import java.io.FileWriter;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import com.geocontentanalyser.infobject.InfobjectExtractor;
 
 public class ThreadManager implements Runnable {
     // Pool of threads with a maximum of 2 threads
@@ -23,12 +22,10 @@ public class ThreadManager implements Runnable {
     // FIFO thread safe queue
     BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
     Callback callback;
-    public int[] countData = { 0, 0 };
     String sessionPath;
-    InfobjectExtractor infobjectExtractor = new InfobjectExtractor(data, sessionPath, false);
-    EServicesExtractor eServicesExtractor = new EServicesExtractor(data, sessionPath, false);
+    List<String> eServices;
 
-    public ThreadManager(String baseURL, String sessionPath, Callback callback, InfobjectExtractor infobjectExtractor, EServicesExtractor eServicesExtractor) {
+    public ThreadManager(String baseURL, String sessionPath,  List<String> eServices,Callback callback) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
@@ -36,6 +33,8 @@ public class ThreadManager implements Runnable {
         this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
+
+        this.eServices = eServices;
     }
 
     @Override
@@ -91,15 +90,14 @@ public class ThreadManager implements Runnable {
 
     // overloaded method for the first execution
     public SiteURLExtractor extractorCall(String baseURL) {
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, sessionPath, new Callback() {
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, sessionPath, eServices,new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
                 data.mergeData(newdata);
                 addToQueue(data.set);
                 writeToFile(data.set);
-            }},
-        this.infobjectExtractor,
-        this.eServicesExtractor);
+            }
+        });
         return siteURLExtractor;
     }
 
@@ -107,7 +105,7 @@ public class ThreadManager implements Runnable {
     public SiteURLExtractor extractorCall(String BaseURL, String URL) {
         // take thread count semaphore
         // start the thread
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, sessionPath, new Callback() {
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, sessionPath, eServices,new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
                 // semaphore to prevent dirty read/write
@@ -123,9 +121,7 @@ public class ThreadManager implements Runnable {
                 // release thread count semaphore
                 threadLimitSemaphore.release();
             }
-        },
-        this.infobjectExtractor,
-        this.eServicesExtractor);
+        });
         return siteURLExtractor;
     }
 

@@ -12,7 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class InfobjectExtractrorThread extends Thread {
+public class InfobjectExtractorThread extends Thread {
     // unique identifier
     public Integer id;
     // main class is passed to an instance of this thread class in order to change the former's attributes, that are global for all infobjects
@@ -39,7 +39,7 @@ public class InfobjectExtractrorThread extends Thread {
     // list of found containers, not to search for them multiple times
     private Elements containers, text_tags;
 
-    InfobjectExtractrorThread(InfobjectExtractor infobjectExtractor, Integer id, Boolean simplify){
+    InfobjectExtractorThread(InfobjectExtractor infobjectExtractor, Integer id, Boolean simplify){
         this.infobjectExtractor = infobjectExtractor;
         this.id = id;
         this.simplify = simplify;

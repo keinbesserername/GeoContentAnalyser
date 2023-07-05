@@ -14,12 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import com.geocontentanalyser.infobject.InfobjectExtractor;
+import com.geocontentanalyser.eService.EServicesListParser;
 import com.geocontentanalyser.urlscraper.Callback;
 import com.geocontentanalyser.urlscraper.Data;
-import com.geocontentanalyser.urlscraper.EServicesExtractor;
 import com.geocontentanalyser.urlscraper.ThreadManager;
-import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
 public class App {
 
@@ -60,6 +58,9 @@ public class App {
         File newfile = new File(sessionPath + File.separator + "URL");
         newfile.mkdir();
 
+        EServicesListParser eServicesListParser = new EServicesListParser();
+        List<String> eServices = eServicesListParser.eServices;
+
         // Allocate the thread pool
         // The number of threads is set to 30
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
@@ -75,15 +76,13 @@ public class App {
         // for (String URL : wikiURLlList) {
         threadCreation.acquireUninterruptibly();
 
-        ThreadManager threadManager = new ThreadManager("https://www.saalekreis.de/", sessionPath, new Callback() {
+        ThreadManager threadManager = new ThreadManager("https://www.saalekreis.de/", sessionPath, eServices, new Callback() {
             @Override
             public void onDataExtracted(Data data) {
 
                 dataList.add(data);
                 threadCreation.release();
-            },
-            this.enfobjectExtractor,
-            this.infobjectExtractor
+            }
         });
         executor.execute(threadManager);
 

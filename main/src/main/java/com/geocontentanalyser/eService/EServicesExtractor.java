@@ -1,15 +1,13 @@
-package com.geocontentanalyser.urlscraper;
+package com.geocontentanalyser.eService;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.jsoup.nodes.Document;
+
+import com.geocontentanalyser.urlscraper.Data;
 
 // extention of Thread is needed for the usage of semaphore
 
@@ -36,6 +34,8 @@ public class EServicesExtractor extends Thread{
     // "simplify" flag is used not to place the output in "capsules" anymore,
     // it is useful for parcing of infobject.txt files (yet to be implemented)
     public Boolean simplify;
+    
+    public List<String> eServices;
 
     // all possible names of services according to FIM katalogue in form of the official CSV table
     private String all_eservices_path = "src" + File.separator + "main" + File.separator + "rec" + File.separator + "all_eservices.csv";
@@ -48,7 +48,7 @@ public class EServicesExtractor extends Thread{
     //
     public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
 
-    EServicesExtractor(Data data, String sessionPfad, Boolean simplify){
+    public EServicesExtractor(Data data, String sessionPfad, Boolean simplify, List<String> eServices){
 
         // create a folder for the duration of the whole search
         this.data = data;
@@ -56,7 +56,7 @@ public class EServicesExtractor extends Thread{
         File dir = new File(this.directory);
         dir.mkdirs();
 
-
+        this.eServices = eServices;
         // root url is used to separate infobjects by files, depending on their landkreis attachment
         // reconfigure(baseURL); 
 
@@ -79,9 +79,9 @@ public class EServicesExtractor extends Thread{
         this.reconfigure(baseURL);
 
         Integer id = 0;
-        if(this.threads.size() < 14){
+        if(this.threads.size() < 1){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));
-            this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify));
+            this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify, this.eServices));
             this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);
             this.threads.get(this.threads.size() - 1).start();
             id++;

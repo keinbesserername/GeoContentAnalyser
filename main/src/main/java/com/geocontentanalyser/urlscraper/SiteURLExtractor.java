@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Connection.Method;
@@ -14,6 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.geocontentanalyser.eService.EServicesExtractor;
 import com.geocontentanalyser.infobject.InfobjectExtractor;
 
 public class SiteURLExtractor implements Runnable {
@@ -27,10 +30,12 @@ public class SiteURLExtractor implements Runnable {
     String URL;
     Data data = new Data(baseURL);
     String noProtocolBaseURL;
+    List<String> eServices;
 
     private Callback callback;
 
-    public SiteURLExtractor(String baseURL, String URL, String sessionPath,Callback callback) {
+    public SiteURLExtractor(String baseURL, String URL, String sessionPath,
+            List<String> eServices, Callback callback) {
 
         this.baseURL = baseURL;
         this.callback = callback;
@@ -38,8 +43,9 @@ public class SiteURLExtractor implements Runnable {
         this.sessionPath = sessionPath;
         this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
-        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.data, this.sessionPath, false);
-        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.data, this.sessionPath, false);
+        this.eServices = eServices;
+        this.infobjectExtractor = new InfobjectExtractor(this.data, this.sessionPath, false);
+        this.eServicesExtractor = new EServicesExtractor(this.data, this.sessionPath,false, eServices);
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -138,7 +144,7 @@ public class SiteURLExtractor implements Runnable {
         output = linkParts[0];
         return output;
     }
-    
+
     public void filter(Document doc) {
         // Insert whatever filter you want here
         // This function presents a HTML file formatted as a JSoup document
@@ -167,18 +173,19 @@ public class SiteURLExtractor implements Runnable {
             }
         }
 
-    }//TODO: test this properly
-    public void externalMapCount(Document doc) {      
-        //Get all links
+    }// TODO: test this properly
+
+    public void externalMapCount(Document doc) {
+        // Get all links
         Elements links = doc.select("a[href]");
         // filter for google maps or bing maps
         for (Element link_Element : links) {
-            //convert to absolute link
+            // convert to absolute link
             String link = link_Element.attr("abs:href");
-            if (link.contains("google.com/maps")|| link.contains("bing.com/maps")) {
+            if (link.contains("google.com/maps") || link.contains("bing.com/maps")) {
                 data.count_ExternalMaps++;
             }
-        }      
+        }
     }
 
     public Boolean isLink(String inputString) {
@@ -196,17 +203,17 @@ public class SiteURLExtractor implements Runnable {
         Document doc = new Document("");
         // retry 3 times if socket times out
         while (retry < 3) {
-            System.out.println("Retry " + retry + " " + URL);
+            //System.out.println("Retry " + retry + " " + URL);
             try {
                 // exponential backoff
                 Thread.sleep((long) (100 * Math.pow(3, retry + 1)));
                 Response response = connection.method(Method.GET).execute();
                 doc = response.parse();
-                System.out.println("success " + URL);
+                //System.out.println("success " + URL);
                 break;
             } catch (Exception e) {
                 retry++;
-                System.out.println("failed");
+                //System.out.println("failed");
             }
         }
         return doc;

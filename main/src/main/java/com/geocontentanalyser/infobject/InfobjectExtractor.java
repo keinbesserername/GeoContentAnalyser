@@ -51,7 +51,7 @@ public class InfobjectExtractor extends Thread{
     
 
     // gets populated with InfobjectExtractorThread classes with each new doc being parsed by SiteURLExtractor
-    private ArrayList<InfobjectExtractrorThread> threads = new ArrayList<InfobjectExtractrorThread>();
+    private ArrayList<InfobjectExtractorThread> threads = new ArrayList<InfobjectExtractorThread>();
     //
     public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
@@ -85,9 +85,9 @@ public class InfobjectExtractor extends Thread{
         this.data.setCount_InfoObjects(this.infobject_counter_global);
 
         Integer id = 0;
-        if(this.threads.size() < 14){
+        if(this.threads.size() < 1){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));
-            this.threads.add(new InfobjectExtractrorThread(this, id, this.simplify));
+            this.threads.add(new InfobjectExtractorThread(this, id, this.simplify));
             this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);
             this.threads.get(this.threads.size() - 1).run();
             id++;
