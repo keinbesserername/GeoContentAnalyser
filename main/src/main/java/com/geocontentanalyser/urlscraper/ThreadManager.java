@@ -28,7 +28,7 @@ public class ThreadManager implements Runnable {
     InfobjectExtractor infobjectExtractor = new InfobjectExtractor(data, sessionPath, false);
     EServicesExtractor eServicesExtractor = new EServicesExtractor(data, sessionPath, false);
 
-    public ThreadManager(String baseURL, String sessionPath, Callback callback) {
+    public ThreadManager(String baseURL, String sessionPath, Callback callback, InfobjectExtractor infobjectExtractor, EServicesExtractor eServicesExtractor) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
@@ -36,6 +36,8 @@ public class ThreadManager implements Runnable {
         this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
+        this.infobjectExtractor = infobjectExtractor;
+        this.eServicesExtractor = eServicesExtractor;
     }
 
     @Override
