@@ -57,15 +57,13 @@ public class InfobjectExtractor extends Thread{
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
     public Semaphore fileSemaphore = new Semaphore(1, isAlive());
 
-    public InfobjectExtractor(String baseURL, Data data, String sessionPfad, Boolean simplify){
+    public InfobjectExtractor(Data data, String sessionPfad, Boolean simplify){
         // create a folder for the duration of the whole search
         this.directory = sessionPfad;
         File dir = new File(this.directory);
         dir.mkdirs();
 
-        this.data = data;
-        // root url is used to separate infobjects by files, depending on their landkreis attachment
-        reconfigure(baseURL);      
+        this.data = data;      
         
         // if true, will not put infobjects into "capsules"
         this.simplify = simplify;

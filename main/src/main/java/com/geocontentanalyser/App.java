@@ -14,12 +14,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.geocontentanalyser.infobject.InfobjectExtractor;
 import com.geocontentanalyser.urlscraper.Callback;
 import com.geocontentanalyser.urlscraper.Data;
+import com.geocontentanalyser.urlscraper.EServicesExtractor;
 import com.geocontentanalyser.urlscraper.ThreadManager;
 import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
 public class App {
+
+    InfobjectExtractor infobjectExtractor = new InfobjectExtractor(data, sessionPath, false);
+    EServicesExtractor eServicesExtractor = new EServicesExtractor(data, sessionPath, false);
+
     public static void main(String[] args) throws IOException {
 
         System.out.println(
@@ -78,7 +84,9 @@ public class App {
 
                 dataList.add(data);
                 threadCreation.release();
-            }
+            },
+            this.enfobjectExtractor,
+            this.infobjectExtractor
         });
         executor.execute(threadManager);
 

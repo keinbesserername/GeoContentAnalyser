@@ -49,7 +49,7 @@ public class EServicesExtractor extends Thread{
     //
     public ArrayList<Semaphore> thread_semaphores = new ArrayList<Semaphore>();
 
-    EServicesExtractor(String url, Data data, String sessionPfad, Boolean simplify){
+    EServicesExtractor(Data data, String sessionPfad, Boolean simplify){
 
         // create a folder for the duration of the whole search
         this.data = data;
@@ -57,12 +57,10 @@ public class EServicesExtractor extends Thread{
         File dir = new File(this.directory);
         dir.mkdirs();
 
-        reconfigure(url);
 
         // root url is used to separate infobjects by files, depending on their landkreis attachment
         // reconfigure(baseURL); 
 
-        this.current_landkreis = url;
         this.simplify = simplify;
     }
 

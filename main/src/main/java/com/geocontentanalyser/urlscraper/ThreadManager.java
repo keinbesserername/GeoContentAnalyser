@@ -8,6 +8,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.geocontentanalyser.infobject.InfobjectExtractor;
+
 public class ThreadManager implements Runnable {
     // Pool of threads with a maximum of 2 threads
     ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
@@ -23,8 +25,10 @@ public class ThreadManager implements Runnable {
     Callback callback;
     public int[] countData = { 0, 0 };
     String sessionPath;
+    InfobjectExtractor infobjectExtractor;
+    EServicesExtractor eServicesExtractor;
 
-    public ThreadManager(String baseURL, String sessionPath, Callback callback) {
+    public ThreadManager(String baseURL, String sessionPath, Callback callback, InfobjectExtractor infobjectExtractor, EServicesExtractor eServicesExtractor) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
@@ -32,6 +36,8 @@ public class ThreadManager implements Runnable {
         this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
+        this.infobjectExtractor = infobjectExtractor;
+        this.eServicesExtractor = eServicesExtractor;
     }
 
     @Override
@@ -93,8 +99,9 @@ public class ThreadManager implements Runnable {
                 data.mergeData(newdata);
                 addToQueue(data.set);
                 writeToFile(data.set);
-            }
-        });
+            }},
+        this.infobjectExtractor,
+        this.eServicesExtractor);
         return siteURLExtractor;
     }
 
@@ -118,7 +125,9 @@ public class ThreadManager implements Runnable {
                 // release thread count semaphore
                 threadLimitSemaphore.release();
             }
-        });
+        },
+        this.infobjectExtractor,
+        this.eServicesExtractor);
         return siteURLExtractor;
     }
 
