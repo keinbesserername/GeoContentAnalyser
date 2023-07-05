@@ -63,29 +63,26 @@ public class App {
         Semaphore threadCreation = new Semaphore(30, true);
 
         // Acquire the list of URLs from Wikipedia
-        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+        // List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
 
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
 
         // Start the threads
-        for (String URL : wikiURLlList) {
-            threadCreation.acquireUninterruptibly();
+        // for (String URL : wikiURLlList) {
+        threadCreation.acquireUninterruptibly();
 
-            ThreadManager threadManager = new ThreadManager(URL, sessionPath, new Callback() {
-                @Override
-                public void onDataExtracted(Data data) {
+        ThreadManager threadManager = new ThreadManager("https://www.saalekreis.de/", sessionPath, new Callback() {
+            @Override
+            public void onDataExtracted(Data data) {
 
-                    dataList.add(data);
-                    System.out.println("Data extracted" + data.getBaseURL());
-                    System.out.println("Embedded maps count: " + data.getCount_EmbeddedMaps());
+                dataList.add(data);
+                threadCreation.release();
+            }
+        });
+        executor.execute(threadManager);
 
-                    threadCreation.release();
-                }
-            });
-            executor.execute(threadManager);
-
-        }
+        // }
         executor.shutdown();
 
         // wait for all threads to finish
@@ -103,11 +100,12 @@ public class App {
             BufferedWriter writer = new BufferedWriter(
                     new FileWriter(sessionPath + File.separator + "statistic.log", false));
             writer.write(
-                    "|Landkreis URL|Address|Coordinates|Embedded Maps|External Maps|Info Objects|\n| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |\n");
+                    "|Landkreis URL|Address|Coordinates|Embedded Maps|External Maps|Info Objects|E-Services|\n| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |\n");
             for (Data data : dataList) {
                 writer.append("|" + data.getBaseURL() + "|" + data.getCount_Address() + "|"
                         + data.getCount_Coordinates() + "|" + data.getCount_EmbeddedMaps() + "|"
-                        + data.getCount_ExternalMaps() + "|" + data.getCount_InfoObjects() + "|\n");
+                        + data.getCount_ExternalMaps() + "|" + data.getCount_InfoObjects() + "|"
+                        + data.getCount_EServices() + "|\n");
             }
             writer.close();
         } catch (Exception e) {
