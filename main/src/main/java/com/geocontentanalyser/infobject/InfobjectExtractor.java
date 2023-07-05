@@ -55,7 +55,7 @@ public class InfobjectExtractor extends Thread{
     // used to write to an infobject.txt file consequtively, not concurrently, not to corrupt it
     public Semaphore fileSemaphore = new Semaphore(1, isAlive());
 
-    InfobjectExtractor(String baseURL, String time, Boolean simplify){
+    public InfobjectExtractor(String baseURL, String time, Boolean simplify){
         // create a folder for the duration of the whole search
         this.time = time;
         this.directory = "output" + File.separator + this.time + File.separator + "infobjects" + File.separator;

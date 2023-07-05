@@ -21,13 +21,14 @@ public class ThreadManager implements Runnable {
     // FIFO thread safe queue
     BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
     Callback callback;
-    public int[] countData = {0,0};
-    
+    public int[] countData = { 0, 0 };
+    String sessionPath;
 
     public ThreadManager(String baseURL, String sessionPath, Callback callback) {
         this.baseURL = baseURL;
         this.data = new Data(baseURL);
         // remove http:// or https:// from the baseURL
+        this.sessionPath = sessionPath;
         this.fileName = sessionPath + "/URL/" + baseURL.replace("www.", "").replace("https://", "")
                 .replace("http://", "").replaceAll("[\\\\/:*?\"<>|]", "");
         this.callback = callback;
@@ -45,24 +46,24 @@ public class ThreadManager implements Runnable {
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
         // 1000 is the maximum number of links to be extracted
-        while (!blockingQueue.isEmpty()&& data.set.size() < 1000) {
+        while (!blockingQueue.isEmpty() && data.set.size() < 1000) {
             try {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore
                 threadLimitSemaphore.acquireUninterruptibly();
-                SiteURLExtractor b= extractorCall(baseURL, URL);
-                executor.execute(b);
+
+                executor.execute(extractorCall(baseURL, URL));
                 // limit to maximum of 2 requests per second.
                 // most of the time, the execution time is less than 500ms
                 // but to be safe, we will limit it to 2 requests per second
                 Thread.sleep(500);
-                //System.out.println("Count right now: " + countData[0]);
+                // System.out.println("Count right now: " + countData[0]);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         }
-        System.out.println("Finished "+ baseURL);
+        System.out.println("Finished " + baseURL);
         executor.shutdown();
         callback.onDataExtracted(data);
     }
@@ -86,7 +87,7 @@ public class ThreadManager implements Runnable {
 
     // overloaded method for the first execution
     public SiteURLExtractor extractorCall(String baseURL) {
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, new Callback() {
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, baseURL, sessionPath, new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
                 data.mergeData(newdata);
@@ -101,7 +102,7 @@ public class ThreadManager implements Runnable {
     public SiteURLExtractor extractorCall(String BaseURL, String URL) {
         // take thread count semaphore
         // start the thread
-        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, new Callback() {
+        SiteURLExtractor siteURLExtractor = new SiteURLExtractor(baseURL, URL, sessionPath, new Callback() {
             @Override
             public void onDataExtracted(Data newdata) {
                 // semaphore to prevent dirty read/write

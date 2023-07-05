@@ -3,9 +3,6 @@ package com.geocontentanalyser.urlscraper;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
@@ -17,12 +14,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.geocontentanalyser.infobject.InfobjectExtractor;
+
 public class SiteURLExtractor implements Runnable {
     LinkedHashSet<String> resultURLs = new LinkedHashSet<String>();
-    String fileName;
     String time;
     InfobjectExtractor infobjectExtractor;
     EServicesExtractor eServicesExtractor;
+    String sessionPath;
 
     String baseURL;
     String URL;
@@ -31,12 +30,13 @@ public class SiteURLExtractor implements Runnable {
 
     private Callback callback;
 
-    public SiteURLExtractor(String baseURL, String URL, Callback callback) {
+    public SiteURLExtractor(String baseURL, String URL, String sessionPath,Callback callback) {
+
         this.baseURL = baseURL;
         this.callback = callback;
         this.URL = URL;
+        this.sessionPath = sessionPath;
         this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
-        this.fileName = baseURL.replaceAll("[\\\\/:*?\"<>|]", "");
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
         this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.time, false);
         this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.time, false);
@@ -139,11 +139,6 @@ public class SiteURLExtractor implements Runnable {
         return output;
     }
     
-    public void filter(Document doc) {       
-        this.infobjectExtractor.extract(doc);
-        //this.eServicesExtractor.extract(doc);
-    }
-
     public void filter(Document doc) {
         // Insert whatever filter you want here
         // This function presents a HTML file formatted as a JSoup document
@@ -154,6 +149,8 @@ public class SiteURLExtractor implements Runnable {
 
         interactiveMapCount(doc);
         externalMapCount(doc);
+        this.infobjectExtractor.extract(doc);
+        //this.eServicesExtractor.extract(doc);
     }
 
     public void interactiveMapCount(Document doc) {
