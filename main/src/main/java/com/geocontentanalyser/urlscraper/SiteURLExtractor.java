@@ -30,16 +30,17 @@ public class SiteURLExtractor implements Runnable {
 
     private Callback callback;
 
-    public SiteURLExtractor(String baseURL, String URL, String sessionPath,Callback callback) {
-
+    public SiteURLExtractor(String baseURL, String URL, String sessionPath,Callback callback, InfobjectExtractor infobjectExtractor,
+    EServicesExtractor eServicesExtractor)
+    {
         this.baseURL = baseURL;
         this.callback = callback;
         this.URL = URL;
         this.sessionPath = sessionPath;
         this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
-        this.infobjectExtractor = new InfobjectExtractor(this.baseURL, this.data, this.sessionPath, false);
-        this.eServicesExtractor = new EServicesExtractor(this.baseURL, this.data, this.sessionPath, false);
+        this.eServicesExtractor = eServicesExtractor;
+        this.infobjectExtractor = infobjectExtractor;
     }
 
     public Data extractURL(String URL) throws IOException, InterruptedException {
@@ -149,13 +150,8 @@ public class SiteURLExtractor implements Runnable {
 
         interactiveMapCount(doc);
         externalMapCount(doc);
-<<<<<<< HEAD
         this.infobjectExtractor.extract(doc, baseURL);
         this.eServicesExtractor.extract(doc, baseURL);
-=======
-        //this.infobjectExtractor.extract(doc, baseURL);
-        //this.eServicesExtractor.extract(doc, baseURL);
->>>>>>> 67811ef7c945564cc808caab59a714381fe76a07
     }
 
     public void interactiveMapCount(Document doc) {

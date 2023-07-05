@@ -8,6 +8,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.geocontentanalyser.infobject.InfobjectExtractor;
+
 public class ThreadManager implements Runnable {
     // Pool of threads with a maximum of 2 threads
     ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
@@ -23,6 +25,8 @@ public class ThreadManager implements Runnable {
     Callback callback;
     public int[] countData = { 0, 0 };
     String sessionPath;
+    InfobjectExtractor infobjectExtractor = new InfobjectExtractor(data, sessionPath, false);
+    EServicesExtractor eServicesExtractor = new EServicesExtractor(data, sessionPath, false);
 
     public ThreadManager(String baseURL, String sessionPath, Callback callback) {
         this.baseURL = baseURL;
@@ -93,8 +97,9 @@ public class ThreadManager implements Runnable {
                 data.mergeData(newdata);
                 addToQueue(data.set);
                 writeToFile(data.set);
-            }
-        });
+            }},
+        this.infobjectExtractor,
+        this.eServicesExtractor);
         return siteURLExtractor;
     }
 
@@ -118,7 +123,9 @@ public class ThreadManager implements Runnable {
                 // release thread count semaphore
                 threadLimitSemaphore.release();
             }
-        });
+        },
+        this.infobjectExtractor,
+        this.eServicesExtractor);
         return siteURLExtractor;
     }
 

@@ -14,12 +14,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.geocontentanalyser.infobject.InfobjectExtractor;
 import com.geocontentanalyser.urlscraper.Callback;
 import com.geocontentanalyser.urlscraper.Data;
+import com.geocontentanalyser.urlscraper.EServicesExtractor;
 import com.geocontentanalyser.urlscraper.ThreadManager;
 import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 
 public class App {
+
     public static void main(String[] args) throws IOException {
 
         System.out.println(
