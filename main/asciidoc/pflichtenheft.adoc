@@ -302,7 +302,7 @@ Ein Klassendiagramm beschreibt Systeme, indem es Klassen, deren Attribute und Op
 zwischen den Klassen aufzeigt.
 
 //TODO
-image::./models/analysis/Klassendiagramm.png[Klassendiagramm,1201,800, pdfwidth=100%, title= "Klassendiagramm von {project_name}", align=center, caption="Abbildung 18: "]
+image::./models/analysis/Klassendiagramm.png[Klassendiagramm,1201,800, pdfwidth=100%, title= "Klassendiagramm von {project_name}", align=center, caption="Abbildung 4: "]
 
 === Klassen und Enumerationen
 
