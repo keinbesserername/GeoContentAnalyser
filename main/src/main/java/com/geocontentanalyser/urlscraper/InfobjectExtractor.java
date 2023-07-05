@@ -44,6 +44,8 @@ public class InfobjectExtractor extends Thread{
     public ArrayList<String> found_addresses = new ArrayList<String>();
     public ArrayList<String> found_emails = new ArrayList<String>();
     public ArrayList<String> found_telephones = new ArrayList<String>();
+    public ArrayList<String> found_coordinates = new ArrayList<String>();
+    
 
     // gets populated with InfobjectExtractorThread classes with each new doc being parsed by SiteURLExtractor
     private ArrayList<Thread> threads = new ArrayList<Thread>();
