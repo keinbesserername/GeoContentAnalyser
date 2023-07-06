@@ -49,7 +49,7 @@ public class ThreadManager implements Runnable {
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
         // 1000 is the maximum number of links to be extracted
-        while (!blockingQueue.isEmpty() && data.set.size() < 1000) {
+        while (!blockingQueue.isEmpty()) {
             try {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore

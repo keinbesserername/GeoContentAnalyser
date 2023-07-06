@@ -5,9 +5,6 @@ import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Connection.Method;
@@ -87,7 +84,7 @@ public class SiteURLExtractor implements Runnable {
                 // Get the content attribute value
                 String content = metaTags.attr("content");
                 // Extract the URL from the content attribute value
-                //System.out.println(content);
+                // System.out.println(content);
                 String redirectUrl = content.substring(content.indexOf("http"));
                 // Navigate to the redirect URL
                 doc = Jsoup.connect(redirectUrl).get();
@@ -139,7 +136,7 @@ public class SiteURLExtractor implements Runnable {
             extractURL(URL);
             callback.onDataExtracted(data);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getMessage();
         }
     }
 
@@ -161,32 +158,22 @@ public class SiteURLExtractor implements Runnable {
         // System.out.println(doc.toString());
         // System.out.println(StringUtils.countMatches(doc.toString(), "<map"));
 
-        interactiveMapCount(doc);
-        externalMapCount(doc);
         try {
-            this.infobjectExtractor.extract(doc, baseURL);
-            this.eServicesExtractor.extract(doc, baseURL);
+            interactiveMapCount(doc);
+            externalMapCount(doc);
+            infobjectExtractor.extract(doc, baseURL);
+            eServicesExtractor.extract(doc, baseURL);
         } catch (Exception e) {
         }
     }
 
     public void interactiveMapCount(Document doc) {
-        String str = doc.toString();
-        // String findStr = "<map";
-        String findStr = "<iframe";
-        int lastIndex = 0;
-        while (lastIndex != -1) {
-
-            lastIndex = str.indexOf(findStr, lastIndex);
-            int endStatement = str.indexOf('>', lastIndex);
-            if (lastIndex != -1) {
-                String sub = str.substring(lastIndex, endStatement);
-                if (sub.contains("google.com/maps") || sub.contains("bing.com/maps")) {
-                    System.out.println(sub);
-                    data.count_EmbeddedMaps++;
-                    System.out.println("map found ");
-                    lastIndex += findStr.length();
-                }
+        Elements iframes = doc.select("iframe");
+        // Iterate over each iframe element
+        for (Element iframe : iframes) {
+            String src = iframe.attr("src");
+            if (src.contains("google.com/maps") || src.contains("bing.com/maps")) {
+                data.count_EmbeddedMaps++;
             }
         }
     }// TODO: test this properly
@@ -202,20 +189,6 @@ public class SiteURLExtractor implements Runnable {
                 data.count_ExternalMaps++;
             }
         }
-    }
-
-    public void addressFilter(Document doc)
-
-    {
-        String input = "Some text before the address\nWörthstraße 15\n36037 Fulda\nSome text after the address";
-        String regex = "\\b\\d{1,3}\\s?[a-zA-ZäöüÄÖÜß]+\\s+\\d{5}\\s+[a-zA-ZäöüÄÖÜß]+\\b";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String address = matcher.group();
-            System.out.println(address);
-        }
-
     }
 
     public Boolean isLink(String inputString) {

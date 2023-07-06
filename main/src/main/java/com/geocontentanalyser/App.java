@@ -19,6 +19,7 @@ import com.geocontentanalyser.urlscraper.Callback;
 import com.geocontentanalyser.urlscraper.Data;
 import com.geocontentanalyser.urlscraper.ThreadManager;
 import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
+
 public class App {
 
     public static void main(String[] args) throws IOException {
@@ -63,30 +64,31 @@ public class App {
 
         // Allocate the thread pool
         // The number of threads is set to 30
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
-        Semaphore threadCreation = new Semaphore(5, true);
+        int threadCount = 5;
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
+        Semaphore threadCreation = new Semaphore(threadCount, true);
 
         // Acquire the list of URLs from Wikipedia
-        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+       List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
 
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
 
         // Start the threads
-         for (String URL : wikiURLlList) {
-        threadCreation.acquireUninterruptibly();
+        for (String URL : wikiURLlList) {
+            threadCreation.acquireUninterruptibly();
 
-        ThreadManager threadManager = new ThreadManager(URL, sessionPath, eServices, new Callback() {
-            @Override
-            public void onDataExtracted(Data data) {
+            ThreadManager threadManager = new ThreadManager(URL, sessionPath, eServices, new Callback() {
+                @Override
+                public void onDataExtracted(Data data) {
 
-                dataList.add(data);
-                threadCreation.release();
-            }
-        });
-        executor.execute(threadManager);
+                    dataList.add(data);
+                    threadCreation.release();
+                }
+            });
+            executor.execute(threadManager);
 
-         }
+        }
         executor.shutdown();
 
         // wait for all threads to finish
