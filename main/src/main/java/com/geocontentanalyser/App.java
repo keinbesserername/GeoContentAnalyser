@@ -64,7 +64,7 @@ public class App {
         // Allocate the thread pool
         // The number of threads is set to 30
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
-        Semaphore threadCreation = new Semaphore(30, true);
+        Semaphore threadCreation = new Semaphore(10, true);
 
         // Acquire the list of URLs from Wikipedia
         // List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
@@ -76,7 +76,7 @@ public class App {
         // for (String URL : wikiURLlList) {
         threadCreation.acquireUninterruptibly();
 
-        ThreadManager threadManager = new ThreadManager("https://turbinehalle-la.com/", sessionPath, eServices, new Callback() {
+        ThreadManager threadManager = new ThreadManager("https://www.altmarkkreis-salzwedel.de/", sessionPath, eServices, new Callback() {
             @Override
             public void onDataExtracted(Data data) {
 

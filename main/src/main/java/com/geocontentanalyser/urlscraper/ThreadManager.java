@@ -120,7 +120,7 @@ public class ThreadManager implements Runnable {
                 // write the difference to file
                 writeToFile(difference);
                 writeTemporaryData();
-                System.out.print(URL+"\n");
+                //System.out.print(URL+"\n");
                 writeProtection.release();
                 
                 // release thread count semaphore

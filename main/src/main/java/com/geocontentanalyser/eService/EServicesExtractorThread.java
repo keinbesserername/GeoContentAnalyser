@@ -8,6 +8,8 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import com.geocontentanalyser.urlscraper.Data;
+
 public class EServicesExtractorThread extends Thread {
 
     //
@@ -22,7 +24,7 @@ public class EServicesExtractorThread extends Thread {
     private Boolean simplify;
     private Boolean found = false;
     public Integer id;
-
+    public Data data;
     // parameters of an eservice
 
     private String title = this.default_title;
@@ -30,7 +32,7 @@ public class EServicesExtractorThread extends Thread {
     private String default_title, default_url;
     private String current_landkreis;
 
-    public EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify, List<String> eServices){
+    public EServicesExtractorThread(EServicesExtractor eServicesExtractor, Integer id, String directory, Boolean simplify, List<String> eServices, Data data){
         this.id = id;
         this.eServicesExtractor = eServicesExtractor;
         this.simplify = simplify;
@@ -149,7 +151,7 @@ public class EServicesExtractorThread extends Thread {
             byte[] bytes = 
             (this.current_landkreis + 
             "\nE-Services Found: " + this.eServicesExtractor.eservice_counter_global + "\n\n\n").getBytes();
-
+            data.setCount_EServices(this.eServicesExtractor.eservice_counter_global);
             file.write(bytes, 0, bytes.length);
 
             file.close();

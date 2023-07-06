@@ -12,6 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.geocontentanalyser.urlscraper.Data;
+
 public class InfobjectExtractorThread extends Thread {
     // unique identifier
     public Integer id;
@@ -27,6 +29,7 @@ public class InfobjectExtractorThread extends Thread {
     //
     private String current_landkreis;
 
+    public Data data;
     
     // parameters of infobjects 
     private HashMap<String,String> infobject_features = new HashMap<>();
@@ -39,11 +42,11 @@ public class InfobjectExtractorThread extends Thread {
     // list of found containers, not to search for them multiple times
     private Elements containers, text_tags;
 
-    InfobjectExtractorThread(InfobjectExtractor infobjectExtractor, Integer id, Boolean simplify){
+    InfobjectExtractorThread(InfobjectExtractor infobjectExtractor, Integer id, Boolean simplify, Data data){
         this.infobjectExtractor = infobjectExtractor;
         this.id = id;
         this.simplify = simplify;
-
+        this.data = data;
         // implement or drop simplified output
         if(this.simplify){
             this.default_title =       "Title       :";                
@@ -385,7 +388,9 @@ public class InfobjectExtractorThread extends Thread {
             "\nInfobjects Found: " + this.infobjectExtractor.infobject_counter_global + 
             "\nUnique Addresses Found: " + this.infobjectExtractor.found_addresses.size() +
             "\nCoordinate Pairs Found: " + this.infobjectExtractor.found_coordinates.size() + "\n\n\n").getBytes();
-
+            data.setCount_InfoObjects(this.infobjectExtractor.infobject_counter_global);
+            data.setCount_Address(this.infobjectExtractor.found_addresses.size());
+            data.setCount_Coordinates(this.infobjectExtractor.found_coordinates.size());
             file.write(bytes, 0, bytes.length);
 
             file.close();

@@ -75,13 +75,12 @@ public class EServicesExtractor extends Thread{
     //
 
     public void extract(Document doc, String baseURL){
-        this.data.setCount_EServices(this.eservice_counter_global);
         this.reconfigure(baseURL);
 
         Integer id = 0;
-        if(this.threads.size() < 1){
+        if(this.threads.size() < 2){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));
-            this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify, this.eServices));
+            this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify, this.eServices , this.data));
             this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);
             this.threads.get(this.threads.size() - 1).start();
             id++;
@@ -94,7 +93,9 @@ public class EServicesExtractor extends Thread{
                     break;      
                 }
             }
-        }      
+        }
+        
+        this.data.setCount_EServices(this.eservice_counter_global);
 
     }
 
