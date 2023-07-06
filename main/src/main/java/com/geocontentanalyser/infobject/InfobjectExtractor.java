@@ -86,7 +86,7 @@ public class InfobjectExtractor extends Thread {
         this.data.setCount_InfoObjects(this.infobject_counter_global);
 
         Integer id = 0;
-        if (this.threads.size() < 2) {
+        if (this.threads.size() < 1) {
             this.thread_semaphores.add(new Semaphore(1, isAlive()));
             this.threads.add(new InfobjectExtractorThread(this, id, this.simplify, data));
             this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);

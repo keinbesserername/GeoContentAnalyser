@@ -78,7 +78,7 @@ public class EServicesExtractor extends Thread{
         this.reconfigure(baseURL);
 
         Integer id = 0;
-        if(this.threads.size() < 2){
+        if(this.threads.size() < 1){
             this.thread_semaphores.add(new Semaphore(1, isAlive()));
             this.threads.add(new EServicesExtractorThread(this, id, this.directory, this.simplify, this.eServices , this.data));
             this.threads.get(this.threads.size() - 1).configure(doc, this.filename, this.current_landkreis);

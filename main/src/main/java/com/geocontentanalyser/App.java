@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -18,7 +18,7 @@ import com.geocontentanalyser.eService.EServicesListParser;
 import com.geocontentanalyser.urlscraper.Callback;
 import com.geocontentanalyser.urlscraper.Data;
 import com.geocontentanalyser.urlscraper.ThreadManager;
-
+import com.geocontentanalyser.wikiscraper.WikiScrapperMain;
 public class App {
 
     public static void main(String[] args) throws IOException {
@@ -64,19 +64,19 @@ public class App {
         // Allocate the thread pool
         // The number of threads is set to 30
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
-        Semaphore threadCreation = new Semaphore(10, true);
+        Semaphore threadCreation = new Semaphore(5, true);
 
         // Acquire the list of URLs from Wikipedia
-        // List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
 
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
 
         // Start the threads
-        // for (String URL : wikiURLlList) {
+         for (String URL : wikiURLlList) {
         threadCreation.acquireUninterruptibly();
 
-        ThreadManager threadManager = new ThreadManager("https://www.altmarkkreis-salzwedel.de/", sessionPath, eServices, new Callback() {
+        ThreadManager threadManager = new ThreadManager(URL, sessionPath, eServices, new Callback() {
             @Override
             public void onDataExtracted(Data data) {
 
@@ -86,7 +86,7 @@ public class App {
         });
         executor.execute(threadManager);
 
-        // }
+         }
         executor.shutdown();
 
         // wait for all threads to finish

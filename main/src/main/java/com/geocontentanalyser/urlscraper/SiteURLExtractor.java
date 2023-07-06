@@ -87,7 +87,7 @@ public class SiteURLExtractor implements Runnable {
                 // Get the content attribute value
                 String content = metaTags.attr("content");
                 // Extract the URL from the content attribute value
-                System.out.println(content);
+                //System.out.println(content);
                 String redirectUrl = content.substring(content.indexOf("http"));
                 // Navigate to the redirect URL
                 doc = Jsoup.connect(redirectUrl).get();

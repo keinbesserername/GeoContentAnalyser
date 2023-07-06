@@ -37,6 +37,7 @@ public class EServicesExtractorThread extends Thread {
         this.eServicesExtractor = eServicesExtractor;
         this.simplify = simplify;
         this.eServices = eServices;
+        this.data = data;
 
         if(this.simplify){
             this.default_title =       "Title       :";
