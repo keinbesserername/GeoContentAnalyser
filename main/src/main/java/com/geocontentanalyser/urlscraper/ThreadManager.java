@@ -18,7 +18,7 @@ public class ThreadManager implements Runnable {
     Data data;
     // semaphore to prevent dirty read/write, and limit the number of threads
     Semaphore writeProtection = new Semaphore(1);
-    Semaphore threadLimitSemaphore = new Semaphore(4, true);
+    Semaphore threadLimitSemaphore = new Semaphore(5, true);
     // FIFO thread safe queue
     BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
     Callback callback;
@@ -44,11 +44,6 @@ public class ThreadManager implements Runnable {
         // extractor got 1 argument for the first execution
         // 2 arguments for the next executions
         extractorCall(baseURL).run();
-        // long previousTime = System.currentTimeMillis();
-
-        // Utilizing the blocking queue, as iterator can throw
-        // ConcurrentModificationException
-        // 1000 is the maximum number of links to be extracted
         while (!blockingQueue.isEmpty()) {
             try {
                 String URL = blockingQueue.poll();
@@ -61,11 +56,9 @@ public class ThreadManager implements Runnable {
                 // but to be safe, we will limit it to 2 requests per second
                 Thread.sleep(500);
                 // System.out.println("Count right now: " + countData[0]);
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
         System.out.println("Finished " + baseURL);
         executor.shutdown();
@@ -99,6 +92,12 @@ public class ThreadManager implements Runnable {
                         addToQueue(data.set);
                         writeToFile(data.set);
                     }
+
+                    @Override
+                    public void onRequestDone() {
+                        // release thread count semaphore
+                        threadLimitSemaphore.release();
+                    }
                 });
         return siteURLExtractor;
     }
@@ -119,10 +118,12 @@ public class ThreadManager implements Runnable {
                 addToQueue(difference);
                 // write the difference to file
                 writeToFile(difference);
-                writeTemporaryData();
+                //writeTemporaryData();
                 //System.out.print(URL+"\n");
-                writeProtection.release();
-                
+                writeProtection.release();       
+            }
+            @Override
+            public void onRequestDone() {
                 // release thread count semaphore
                 threadLimitSemaphore.release();
             }
