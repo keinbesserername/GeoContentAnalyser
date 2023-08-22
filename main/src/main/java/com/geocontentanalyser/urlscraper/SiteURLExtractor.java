@@ -70,10 +70,6 @@ public class SiteURLExtractor implements Runnable {
             retry(connection);
         } catch (HttpStatusException e) {
             // if the socket times out, retry
-            // dont retry if the status code is 4xx
-            if (e.getStatusCode() >= 400 && e.getStatusCode() < 500) {
-                return data;
-            }
             System.out.println("HTTP Status Exception");
             retry(connection);
         } catch (Exception e) {
@@ -96,11 +92,10 @@ public class SiteURLExtractor implements Runnable {
         } catch (Exception e) {
             System.out.println("Internal redirection failed");
         }
-
-        // move the semaphore release here.
-        // New threads can be spawned in after the request is done.
-        // Detach the filtering from the request, allows request to not be blocked by
-        // slow filtering.
+        
+        //move the semaphore release here.
+        //New threads can be spawned in after the request is done.
+        //Detach the filtering from the request, allows request to not be blocked by slow filtering.
         callback.onRequestDone();
 
         // doc = connection.get();
