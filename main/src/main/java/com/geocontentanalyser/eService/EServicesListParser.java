@@ -11,7 +11,7 @@ import java.util.List;
 public class EServicesListParser {
 
     // all possible names of services according to FIM katalogue in form of the official CSV table
-    private String all_eservices_path = "main/src" + File.separator + "main" + File.separator + "rec" + File.separator + "all_eservices.csv";
+    private String all_eservices_path = "all_eservices.csv";
     // parse it into a list
     public List<String> eServices = this.parse_eservices();
 

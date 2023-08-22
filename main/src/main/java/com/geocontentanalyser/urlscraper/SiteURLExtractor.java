@@ -70,6 +70,9 @@ public class SiteURLExtractor implements Runnable {
             retry(connection);
         } catch (HttpStatusException e) {
             // if the socket times out, retry
+            if (e.getStatusCode() >= 400 && e.getStatusCode() < 500) {
+                return data;
+            }
             System.out.println("HTTP Status Exception");
             retry(connection);
         } catch (Exception e) {

@@ -1,7 +1,9 @@
 package com.geocontentanalyser;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -69,8 +71,17 @@ public class App {
         Semaphore threadCreation = new Semaphore(threadCount, true);
 
         // Acquire the list of URLs from Wikipedia
-       List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
-
+        // List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+        // read each line from t.log and save to a list
+        List<String> wikiURLlList = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader("site.log"));
+        String line = reader.readLine();
+        int i = 0;
+        while (line != null && i < 29) {
+            wikiURLlList.add(line);
+            line = reader.readLine();
+        }
+        reader.close();
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
 
@@ -118,4 +129,5 @@ public class App {
             // TODO: handle exception
         }
     }
+
 }

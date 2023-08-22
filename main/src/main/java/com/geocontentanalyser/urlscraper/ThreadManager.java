@@ -44,12 +44,12 @@ public class ThreadManager implements Runnable {
         // extractor got 1 argument for the first execution
         // 2 arguments for the next executions
         extractorCall(baseURL).run();
-        // long previousTime = System.currentTimeMillis();
+        long previousTime = System.currentTimeMillis();
 
         // Utilizing the blocking queue, as iterator can throw
         // ConcurrentModificationException
         // 1000 is the maximum number of links to be extracted
-        while (!blockingQueue.isEmpty()) {
+        while (!blockingQueue.isEmpty()&& System.currentTimeMillis()-previousTime<900000) {
             try {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore
