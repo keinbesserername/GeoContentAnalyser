@@ -92,11 +92,6 @@ public class SiteURLExtractor implements Runnable {
         } catch (Exception e) {
             System.out.println("Internal redirection failed");
         }
-        
-        //move the semaphore release here.
-        //New threads can be spawned in after the request is done.
-        //Detach the filtering from the request, allows request to not be blocked by slow filtering.
-        callback.onRequestDone();
 
         // doc = connection.get();
         // get all links

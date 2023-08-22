@@ -69,7 +69,7 @@ public class App {
         Semaphore threadCreation = new Semaphore(threadCount, true);
 
         // Acquire the list of URLs from Wikipedia
-        List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
+       List<String> wikiURLlList = WikiScrapperMain.crawler(sessionPath);
 
         // create a list to store the data objects
         List<Data> dataList = new ArrayList<>();
@@ -84,12 +84,6 @@ public class App {
 
                     dataList.add(data);
                     threadCreation.release();
-
-                }
-
-                @Override
-                public void onRequestDone() {
-                    //Do nothing. This is not used here.
                 }
             });
             executor.execute(threadManager);
