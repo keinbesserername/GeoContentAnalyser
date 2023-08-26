@@ -1,5 +1,6 @@
 package com.geocontentanalyser.urlscraper;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -54,7 +55,8 @@ public class ThreadManager implements Runnable {
                 String URL = blockingQueue.poll();
                 // take thread count semaphore
                 threadLimitSemaphore.acquireUninterruptibly();
-
+                
+                //extractorCall(baseURL, URL).run();
                 executor.execute(extractorCall(baseURL, URL));
                 // limit to maximum of 2 requests per second.
                 // most of the time, the execution time is less than 500ms
@@ -63,12 +65,17 @@ public class ThreadManager implements Runnable {
                 // System.out.println("Count right now: " + countData[0]);
 
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
 
         }
         System.out.println("Finished " + baseURL);
+        // rename the temporary file to the actual file
         executor.shutdown();
+        
+        File currentName = new File(fileName + ".log");
+        File newName = new File(fileName + "-done.log");
+        currentName.renameTo(newName);
         callback.onDataExtracted(data);
     }
 
@@ -85,7 +92,7 @@ public class ThreadManager implements Runnable {
             }
             writer.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -133,13 +140,13 @@ public class ThreadManager implements Runnable {
     public void writeTemporaryData() {
         FileWriter writer;
         try {
-            writer = new FileWriter(fileName + ".tmp", true);
+            writer = new FileWriter(fileName + ".tmp", false);
             writer.write(data.getCount_InfoObjects() + "-" + data.getCount_EServices() + "-" + data.getCount_Address()
                     + "-" + data.getCount_Coordinates() + "-" + data.getCount_EmbeddedMaps() + "-"
                     + data.getCount_ExternalMaps() + "-" + data.set.size() + "\n");
             writer.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

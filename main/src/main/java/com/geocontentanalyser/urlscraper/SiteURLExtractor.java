@@ -40,7 +40,7 @@ public class SiteURLExtractor implements Runnable {
         this.callback = callback;
         this.URL = URL;
         this.sessionPath = sessionPath;
-        this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "");
+        this.noProtocolBaseURL = baseURL.replace("https://", "").replace("http://", "").replace("www.", "");
         this.time = Instant.now().toString().replace(":", "-").replace(".", "-").substring(0, 16);
         this.eServices = eServices;
         this.infobjectExtractor = new InfobjectExtractor(this.data, this.sessionPath, false);
@@ -53,7 +53,7 @@ public class SiteURLExtractor implements Runnable {
 
         Connection connection = Jsoup.connect(URL).followRedirects(true)
                 .userAgent(
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
+                        "PostmanRuntime/7.26.5");
 
         // this is very slow. The bottleneck lays here
 
@@ -76,7 +76,7 @@ public class SiteURLExtractor implements Runnable {
             System.out.println("HTTP Status Exception");
             retry(connection);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         // logic to handle internal redirection
@@ -116,7 +116,7 @@ public class SiteURLExtractor implements Runnable {
         LinkedHashSet<String> set = new LinkedHashSet<String>();
 
         for (Element link : links) {
-            String linkString = trackerStripper(link.attr("abs:href"));
+            String linkString = link.attr("abs:href");
             String strippedLink = trackerStripper(linkString);
 
             if (strippedLink.contains(noProtocolBaseURL) && (!strippedLink.contains("javascript"))

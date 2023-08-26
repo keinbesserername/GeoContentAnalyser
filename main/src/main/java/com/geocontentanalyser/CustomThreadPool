@@ -1,0 +1,19 @@
+package com.geocontentanalyser;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+public class CustomThreadPool {
+    private int size;
+    private ExecutorService executor;
+    private int priority;
+
+    public CustomThreadPool(int size, int priority) {
+        this.size = size;
+        this.priority = priority;
+        executor = new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS,
+                
+    }
+}   

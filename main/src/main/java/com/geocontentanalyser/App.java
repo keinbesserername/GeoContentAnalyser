@@ -66,7 +66,7 @@ public class App {
 
         // Allocate the thread pool
         // The number of threads is set to 30
-        int threadCount = 5;
+        int threadCount = 15;
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
         Semaphore threadCreation = new Semaphore(threadCount, true);
 
@@ -76,8 +76,7 @@ public class App {
         List<String> wikiURLlList = new ArrayList<String>();
         BufferedReader reader = new BufferedReader(new FileReader("site.log"));
         String line = reader.readLine();
-        int i = 0;
-        while (line != null && i < 29) {
+        while (line != null) {
             wikiURLlList.add(line);
             line = reader.readLine();
         }
@@ -98,6 +97,7 @@ public class App {
                 }
             });
             executor.execute(threadManager);
+            //threadManager.run();
 
         }
         executor.shutdown();

@@ -1,0 +1,6 @@
+https://www.kyffhaeuser.de -- code 500 (Internal Server Error)
+https://hohenlohekreis.de -- SSL certificate cannot be verified
+https://www.helmstedt.de -- SSL handshake failed
+https://www.mainz-bingen.de --useragent filtering
+https://www.landratsamt-dachau.de --Regex error
+http://www.saarpfalz-kreis.de -- Cloudflare anti-bot protection
